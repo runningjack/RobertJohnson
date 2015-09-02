@@ -1,0 +1,9 @@
+[16-Jan-2014 09:22:11 Europe/Berlin] PHP Fatal error:  Class 'Session' not found in /home/robertjo/public_html/control/index.php on line 11
+[18-Jan-2014 14:48:19 Europe/Berlin] PHP Fatal error:  Uncaught exception 'Exception' with message 'DateTime::__construct() [<a href='datetime.--construct'>datetime.--construct</a>]: Failed to parse time string (20) at position 0 (2): Unexpected character' in /home/robertjo/public_html/control/models/clientproduct_model.php:350
+Stack trace:
+#0 /home/robertjo/public_html/control/models/clientproduct_model.php(350): DateTime->__construct('20')
+#1 /home/robertjo/public_html/control/controllers/clientproduct.php(237): Clientproduct_Model->updateSchedule()
+#2 /home/robertjo/public_html/control/system/library/bootstrap.php(51): Clientproduct->doScheduleUpdate()
+#3 /home/robertjo/public_html/control/index.php(18): Bootstrap->__construct()
+#4 {main}
+  thrown in /home/robertjo/public_html/control/models/clientproduct_model.php on line 350

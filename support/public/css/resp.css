@@ -1,0 +1,94 @@
+
+/******************************   RESPONSIVE VIEW FOR DEVICES WITH A MAXIMUM OF 750PX SCREEN WIDTH   **********************************/
+
+@media all and (max-width:640px) {
+
+	.wrapper {
+		width: 90%!important;
+		margin: 0 10px;
+	}
+	.right {
+		float: none;
+		display: block;
+	}
+	.left {
+		float: none;
+		display: block;
+	}
+
+	div.row .right-label{
+		float: none;
+		display: block;
+		padding: 7px 5px 7px 15px;
+		width: 150px;
+		background: #fff;
+		margin-right: 10px;
+	}
+	div.row .form{
+		width: 95%;
+	}
+	form .submit {
+		margin-left: 0px;
+	}
+	
+	input, textarea {
+		width: 95%;
+	}
+
+	/************************  HEADER  *************************/
+	div#header {
+		padding: 0 0 5px;
+		text-align: center;
+	}
+	div#header .welcome {
+		display: block;
+		margin-top: 20px;
+		text-align: center;
+	}
+	div#header .welcome img{
+		float: left;
+		margin-right: 2px;
+		display: inline;
+	}
+	#menu ul li{
+		display: block;
+		width: 100%;
+		text-align: center;
+	}
+
+	/************************* MAIN *************************/
+
+	div#main {
+		width: 100%;
+	}
+	div#main .small_container, div#main .wider_container {
+		display: block;
+		width:100%;
+		margin-top: 60px;
+		float: none;
+	}
+	div#main .wider_container {
+		width: 90%;
+		float: none;
+		margin-top: 20px;
+	}
+	div#main .small_sidebar {
+		width: 90%;
+		float: none;
+		display: block;
+		background: #FCFCFC;
+		margin: 0;
+		margin-top: 20px;
+	}
+
+	/************************* FOOTER *************************/
+	div#footer {
+		padding: 5px 0;
+		width: 100%;
+		background: #fcfcfc;
+		border-top:1px solid #C9C9C9;
+		text-align: center;
+		font-size: smaller;
+	}
+
+}

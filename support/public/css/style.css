@@ -1,0 +1,84 @@
+/* CSS Document */
+#slider_background{
+}
+#navigation li:hover{
+	background-color:#fff;
+	color:#fff;
+}
+#navigation li.present{
+	background-color:#aaa;
+}
+#navigation li.present:hover{
+	background-color:#fff;
+}
+#top_bar_color{
+	background-color:#ddd;	
+}
+#sidebar_border{
+	border:solid 1px #666;
+	border-radius:9px;	
+}
+#color_red{
+	color:#2B2B2B;
+	font-size:1.5em;
+}
+#still_background{
+	background-color:#fff;	
+}
+#ash_bg{
+	padding:0.1em 0.5em 0.6em 0.5em;
+	height:13em;
+	margin-bottom:0.5em;
+	border-radius:0.4em;
+	border:solid 0.2em #eee;
+}
+#heading_color{
+	background-color:#eee;	
+}
+body{
+	padding-top:1.2em;
+	background-color:#2A5361;
+}
+.boxes{
+	border:solid 0.2em #2A5361;
+	margin:0 1.5em; 
+	border-radius:0.5em;
+	padding-bottom:2em;
+	padding-top:0.5em;
+	background-color:#2A5361;
+	color:#fff;
+}
+.row-borders{
+	margin:0 1.5em;
+}
+
+/* Start by setting display:none to make this hidden.
+   Then we position it in relation to the viewport window
+   with position:fixed. Width, height, top and left speak
+   speak for themselves. Background we set to 80% white with
+   our animation centered, and no-repeating */
+.ajaxloading {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url(../images/ajax-loader.gif)
+                50% 50% 
+                no-repeat;
+}
+
+/* When the body has the loading class, we turn
+   the scrollbar off with overflow:hidden */
+#display.loading {
+    overflow: hidden;   
+}
+
+/* Anytime the body has the loading class, our
+   modal element will be visible */
+#display.loading .ajaxloading {
+    display: block;
+}

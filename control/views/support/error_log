@@ -1,0 +1,7 @@
+[29-Dec-2013 23:08:38 Europe/Berlin] PHP Fatal error:  Using $this when not in object context in /home/robertjo/public_html/control/views/support/sendmail.php on line 16
+[29-Dec-2013 23:09:15 Europe/Berlin] PHP Fatal error:  Class 'Mail' not found in /home/robertjo/public_html/control/views/support/sendmail.php on line 23
+[29-Dec-2013 23:11:40 Europe/Berlin] PHP Notice:  Error: E-Mail to required! in /home/robertjo/public_html/control/system/library/mail.php on line 57
+[30-Dec-2013 03:11:04 Europe/Berlin] PHP Notice:  Error: E-Mail message required! in /home/robertjo/public_html/control/system/library/mail.php on line 79
+[30-Dec-2013 16:14:38 Europe/Berlin] PHP Fatal error:  Using $this when not in object context in /home/robertjo/public_html/control/views/support/sendmail.php on line 17
+[30-Dec-2013 16:15:40 Europe/Berlin] PHP Fatal error:  Call to undefined method Mailtemplate::gettmp() in /home/robertjo/public_html/control/views/support/sendmail.php on line 46
+[30-Dec-2013 16:25:41 Europe/Berlin] PHP Notice:  Error: E-Mail to required! in /home/robertjo/public_html/control/system/library/mail.php on line 51
