@@ -1,9 +1,11 @@
 <?php
+
 class Supportticket_Model extends Model{
 	function __construct(){
 		parent::__construct();
 		
 	}
+
 	public function getList($id="",$pg){
 		 $purl = array();
 		if(isset($_GET['url'])){
@@ -88,10 +90,11 @@ class Supportticket_Model extends Model{
 		$role			= Roles::find_all();
 		$country 		= Country::find_all();
         $vendors 		= Vendor::find_all();
+        $products       = Product::find_all();
 		$myproducts		= Cproduct::find_by_client($_SESSION['client_ident']);
 		$zone 			= Zone::find_by_sql("SELECT * FROM zone");
 		$issues			= Issue::find_all();
-		$startups 		= array("departs"=>$depts,"country"=>$country,"zone"=>$zone,"vendors"=>$vendors,"role"=>$role,"myproducts"=>$myproducts,"issues"=>$issues);
+		$startups 		= array("departs"=>$depts,"country"=>$country,"zone"=>$zone,"vendors"=>$vendors,"role"=>$role,"myproducts"=>$myproducts,"issues"=>$issues,"products"=>$products);
 		return $startups;		
 	}
     
@@ -117,10 +120,25 @@ class Supportticket_Model extends Model{
 
         if(isset($_POST["terminal_id"])){
             if($_POST['terminal_id'] != ""){
-                $newticket->contact_name = $_POST['terminal_id'];
+                $newticket->terminal_id = $_POST['terminal_id'];
             }
-            else array_push($error,"Name");
-        }else array_push($error,"Name");
+            else array_push($error,"Terminal ID");
+        }else array_push($error,"Terminal ID");
+
+       /* if(isset($_POST["atm_type"])){
+            if($_POST['atm_type'] != ""){
+                $newticket->atm_type = $_POST['atm_type'];
+            }
+            else array_push($error,"ATM TYPE");
+        }else array_push($error,"ATM TYPE");*/
+
+
+        if(isset($_POST["branch"])){
+            if($_POST['branch'] != ""){
+                $newticket->branch = $_POST['branch'];
+            }
+            else array_push($error,"Branch");
+        }else array_push($error,"Branch");
 		
 		if(isset($_POST["email"])){
 			if($_POST['email'] != "" && preg_match("/^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,3})$/i", $_POST["email"])){
@@ -136,13 +154,17 @@ class Supportticket_Model extends Model{
 			else array_push($error,"Phone Number");
 		}else array_push($error,"Phone Number");
 		
-		if(isset($_POST["service"])){
-			$cid = explode("_",$_POST["service"]);
-			$newticket->prod_id = $cid[0];
+		if(isset($_POST["location"])){
+            $newticket->location = $_POST["location"];
+
+		}else array_push($error,"Location");
+
+        /*if(isset($_POST["location"])){
+            $newticket->location = $_POST["location"];
             $newticket->prod_name = $cid[1];
-			$newticket->location = $cid[2];
-		}else array_push($error,"Product");
-		
+        }else array_push($error,"Location");*/
+
+
 		if(isset($_POST["plevel"])){
 			$newticket->priority = $_POST["plevel"];
 		}else array_push($error,"Priority");
@@ -153,21 +175,67 @@ class Supportticket_Model extends Model{
 			$newticket->issue = htmlspecialchars($_POST['issue']);
 		}else array_push($error,"Issue");
 		
-		$newticket->department = $_POST["dept"];
+		$newticket->department  = $_POST["dept"];
         $newticket->datecreated = $newticket->datemodified = date("Y-m-d H:i:s");
-        $newticket->status = "Open";                   
-        $newticket->client_id = $_SESSION["client_ident"];
+        $newticket->status      = "Open";
+        $newticket->client_id   = $_SESSION["client_ident"];
 		
 		if(!empty($_FILES['fupload']['name']) && $_FILES['fupload']['error']==0){ //if file upload is set
 			move_uploaded_file($_FILES['fupload']['tmp_name'],"public/uploads/".basename($_FILES['fupload']['name']));
-			$ext = pathinfo($_FILES['fupload']['name'],PATHINFO_EXTENSION);
-			$new_name = uniqid()."_".time().$ext; //new name for the image
+			$ext                = pathinfo($_FILES['fupload']['name'],PATHINFO_EXTENSION);
+			$new_name           = uniqid()."_".time().$ext; //new name for the image
 			rename("public/uploads/".basename($_FILES['fupload']['name']),"public/uploads/".$new_name);
-			$photo = $new_name;
-			$newticket->file = $photo;
-		}            
+			$photo              = $new_name;
+			$newticket->file    = $photo;
+		}
+
 		if(empty($error)){
-				
+                    if(Cproduct::find_by_terminal($_POST['terminal_id'])){
+                        $cproduct= Cproduct::find_by_terminal($_POST['terminal_id']);
+                        $cproduct->client_id 					=	$_SESSION["client_ident"];
+                        //$cproduct->client_name				=	$_POST["clientname"];
+                        $cproduct->prod_id                      =   $_POST['terminal_id'];
+                        $cproduct->terminal_id                  =   $_POST['terminal_id'];
+                        $cproduct->branch                       =   $_POST['branch'];
+                        $cproduct->atm_type                     =   $_POST['atm_type'];
+                        $cproduct->install_status				=	1;
+                        $cproduct->status  					    =	1;
+                        $cproduct->client_id                    = $_SESSION['client_ident'];
+                        $cproduct->install_city                 = $_POST['city'];
+                        $cproduct->install_address              = $_POST['location'];
+                        $cproduct->install_state                = $_POST['state'];
+                        $cproduct->update();
+                        $newticket->prod_id = $cproduct->id;
+
+                    }else{
+
+                        $cproduct = new Cproduct();
+                        $cproduct->client_id 					=	$_SESSION["client_ident"];
+                        //$cproduct->client_name				=	$_POST["clientname"];
+                        $cproduct->prod_id                      =   $_POST['terminal_id'];
+                        $cproduct->terminal_id                  =   $_POST['terminal_id'];
+                        $cproduct->branch                       =   $_POST['branch'];
+                        $cproduct->atm_type                     =   $_POST['atm_type'];
+                        $cproduct->install_status				=	1;
+                        $cproduct->status  					    =	1;
+                        $cproduct->datecreated  				=	date("Y-m-d H:i:s");
+                        $cproduct->install_city                 = $_POST['city'];
+                        $cproduct->install_address              = $_POST['location'];
+                        $cproduct->install_state                = $_POST['state'];
+                        $cproduct->create();
+                        $newticket->prod_id = $cproduct->id;
+
+                        $newticket->prod_id = $cproduct->id;
+
+                    }
+
+
+
+               // }
+
+            $newticket->terminal_id = $cproduct->terminal_id;
+
+
 			if($newticket->create()){
 				
 				$ddticket					=		Ticket::find_by_id($newticket->id);				
@@ -211,7 +279,9 @@ class Supportticket_Model extends Model{
 						}
 					}
 				}
-				$this->sendMail($newReply->id);
+
+                ($this->sendMail($newReply->id));
+
 				return 1;     //returns 1 on success  
 				
 			}
@@ -219,13 +289,14 @@ class Supportticket_Model extends Model{
 				return 2;       // returns 2 on insert error
 			}
 		}else{
+
 			$message = "Please check the following errors: ";
 			$lenght = count($error);
 			for($i = 0; $i < $lenght; $i++){
 				$message = $message.$error[$i].", ";
 			}
             echo "<div data-alert class='alert-box error'><a href='#' class='close'>&times;</a>$message</div>";
-            exit;
+
 		}
 	}
 
@@ -287,30 +358,40 @@ class Supportticket_Model extends Model{
 		 $ticket = Ticket::find_by_id($reply->ticket_id);
 		 $ccemails = Ccemail::find_by_ticket($reply->ticket_id);
 		 $client = Client::find_by_id($_SESSION['client_ident']);
-		 
+
 
 		$to = 'support@robertjohnsonholdings.com';
+         $t ='i.arowolo@robertjohnsonholdings.com';
+       $cc="";
 
-		$subject = 'RE: Ticket Number: #'.str_pad($ticket->id,8,"0",STR_PAD_LEFT)." ".$ticket->subject;
+		$subject = 'Ticket Number: #'.str_pad($ticket->id,8,"0",STR_PAD_LEFT)." ".$ticket->subject;
 		
 		$headers = "From: ".$client->name."<" . $client->email . ">\r\n";
 		$headers .= "Reply-To: ". $ticket->contact_email . "\r\n";
 		if($ccemails){
 			 $copyaddy = array();
-			 $cc = "";
+
 			foreach($ccemails as $ccemail){
 				array_push($copyaddy, $ccemail->email);
 			}
 			for($i = 0; $i < count($copyaddy); $i++){
-				if($i == (count($copyaddy)-1)){
-					$cc .= $copyaddy[$i];	
-				}else $cc .= $copyaddy[$i].", ";
+				 $cc .= ",".$copyaddy[$i];
 			}
-			$to .= ", ".$cc;
+            $t .= $cc;
 		 }
-		$headers .= "MIME-Version: 1.0\r\n";
+         $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Cc: ".$t . "\r\n";
 		$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-		
+        $headers .=  'X-Mailer: PHP/' . phpversion()."\r\n";
+
+        /* $smtp = \Mail::factory('smtp', array(
+             'host' => 'ssl://n1plcpnl0021.prod.ams1.secureserver.net',
+             'port' => '465',
+             'auth' => true,
+             'username' => 'rjsupport@robertjohnsonsupport.com',
+             'password' => 'rjsupport2015'
+         ));*/
+
 		$message = '
 			<html><body>
 			<h1>Robert Johnson Holdings Limited</h1>
@@ -336,7 +417,7 @@ class Supportticket_Model extends Model{
 				if($ccemails){
 					$message .= '<tr>
 							<th scope="row">Copied Emails</th>
-							<td>'.$cc.'</td>
+							<td>'.$t.'</td>
 						  </tr>
 						  <tr>';
 				}
@@ -353,7 +434,7 @@ class Supportticket_Model extends Model{
 				  </tr>
 				  <tr>
 					<th scope="row">Related Product/Service</th>
-					<td>'.$ticket->prod_name.' at '.$ticket->location.'</td>
+					<td>'.$ticket->terminal_id.' at '.$ticket->location.'</td>
 				  </tr>
 				  <tr>
 					<th scope="row">Subject</th>
@@ -361,13 +442,26 @@ class Supportticket_Model extends Model{
 				  </tr>
 				  <tr>
 					<th scope="row">Issue/Complaint/Suggestion</th>
-					<td>'.$reply->message.'</td>
+					<td>'.$ticket->issue.'</td>
 				  </tr>
 				</table>
 			</body></html>';
-		 if(mail($to, $subject, $message, $headers)){
-			return true; 
-		 }else return false;
+         if(mail($to, $subject, $message, $headers)){
+             return true;
+         }else return false;
+/*
+         $mail = $smtp->send($to, $headers, $message);
+
+         if (PEAR::isError($mail)) {
+             echo('<p>' . $mail->getMessage() . '</p>');
+             echo "error";
+            return true;
+         } else {
+             echo "success";
+             return false;
+         }*/
+         //lse return false;
+
 	 }
 	 
 	 public function sendMailCloseTicket($id){

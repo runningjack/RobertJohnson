@@ -37,7 +37,7 @@ class Users_Model extends Model{
 		return $index_array;
 	}
 	public function getById($id){
-		$myuser = User::find_by_id($id);
+		$myuser = Clientuser::find_by_id($id);
 		return $myuser;
 	}
 	public function getRoles(){
@@ -57,7 +57,7 @@ class Users_Model extends Model{
 		global $database;
 		if (isset($_POST['Submit'])  && !empty($_POST['password']) && !empty($_POST['email']) && !empty($_POST['mid'])){
 			
-			$theuser = User::find_by_id((int)preg_replace('#[^0-9]#i','',$_POST['mid'])) ;
+			$theuser = Clientuser::find_by_id((int)preg_replace('#[^0-9]#i','',$_POST['mid'])) ;
 			if($theuser){
 				$company	=	Client::find_by_id($_SESSION['client_ident']);
 				
@@ -122,17 +122,19 @@ class Users_Model extends Model{
 	public function create(){
 		global $database;
 		if (isset($_POST['Submit'])  && !empty($_POST['password']) && !empty($_POST['email'])){
-			$newuser = new User();
+			$newuser = new Clientuser();
 			$company	=	Client::find_by_id($_SESSION['client_ident']);
 					 
 			$newuser->fname				=	$_POST['fname'];
 			$newuser->username			=	$_POST['email'];
 			$newuser->lname				=	$_POST['sname'];
 			$newuser->password			=	$_POST['password'];
-			$newuser->phone				=	$_POST['phone'];
+			$newuser->phone				=	"08076525353";//$_POST['phone'];
 			$newuser->email				=	$_POST['email'];
 			$newuser->company_id		=	$company->id;
 			$newuser->company			=	$company->name;
+            $newuser->client_id         = $company->id;
+            $newuser->user_role         = "standard";
 			$newuser->date_added		=	date("Y-m-d H:i:s");
 			if(isset($_FILES['fupload']) && $_FILES['fupload']['error']==0){
 				move_uploaded_file($_FILES['fupload']['tmp_name'],"public/uploads/".basename($_FILES['fupload']['name']));
@@ -167,8 +169,23 @@ class Users_Model extends Model{
 				$newuser->img_url = $photo;
 				  
 			  }
-			  if($database->db_query("SELECT * FROM users_client WHERE username='".$theuser->username."' OR phone='".$theuser->phone."' OR email='".$theuser->email."'")){
+			  if($database->db_query("SELECT * FROM users_client WHERE username='".$newuser->username."' OR phone='".$newuser->phone."' OR email='".$newuser->email."'")){
 					if($newuser->create()){
+                        $to = $newuser->email;
+                        $subject = 'RJ Support ATM Services Portal ';
+
+                        $headers = "From: ".$company->name."<" . $company->email . ">\r\n";
+                        $headers .= "Reply-To: ". $company->contact_email . "\r\n";
+                        $headers .= "MIME-Version: 1.0\r\n";
+                        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+
+                        $message ="<p>Your username and password on the Robert Johnson ATM Support Portal is as below </p> ";
+                        $message .="<p><b>Username: </b>". $newuser->email."<br>";
+                        $message .="<b>Password: </b>". $_POST['password']."<br></p>";
+                        $message .= "<br><br> Thank You";
+
+
+                        mail($to, $subject, $message, $headers);
 						return 1;
 					}else{
 						return 2;
@@ -186,7 +203,7 @@ class Users_Model extends Model{
    
     
 	public function delete($id){
-		$newuser = User::find_by_id($id);
+		$newuser = Clientuser::find_by_id($id);
 		if($newuser->delete()){
 			return true;
 		}

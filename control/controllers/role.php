@@ -14,7 +14,15 @@ class Role extends Controller
 	public function index(){
 		@$this->loadModel("Role");
 		$this->view->myrole = $this->model->getList();
-		$this->view->render("role/index");
+
+        if(Session::getRole()){
+            if(in_array(strtolower(get_class($this)), $_SESSION['emp_role_module'])){
+                $this->view->render("role/index");
+            }else{
+
+                $this->view->render("access/restricted");
+            }
+        }
 	}
     public function grants($id){
         global $database;

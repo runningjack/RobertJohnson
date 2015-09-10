@@ -32,6 +32,14 @@
                 <input type="text" placeholder="Username" name='username' id='username' class="large-12" />
                 <label>Password</label>
                 <input type="password" placeholder="Password" name="password" id="password" class="large-12" />
+
+                <label>Role</label>
+                <select name="myrole" id="myrole">
+                    <option value="">--Select Role--</option>
+                    <option value="admin">Administrator</option>
+                    <option value="standard user">Standard User</option>
+                </select>
+
                 <input type="button"  class="submit " id='login' name="login" value="Login" /> 
                <!-- <a href="#" class=" center" data-reveal-id="forgetPassword">Forgot Password?</a>-->
         	</fieldset>
@@ -62,7 +70,7 @@
     <script type="text/javascript">
 		$(document).ready(function(e) {
         $("#login").click(function(){
-            $.ajax({url:'?url=login/doLogin',type:"POST",data:{username:$('#username').val(), password:$("#password").val()},
+            $.ajax({url:'?url=login/doLogin',type:"POST",data:{username:$('#username').val(), password:$("#password").val(),userole:$("#myrole").val()},
                 success: function(result){
                     logmein(parseInt(result)) 
                 },error: function(){

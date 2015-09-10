@@ -31,30 +31,76 @@
 		
 		global $database;
 		$resultUser = $database->db_query("SELECT * FROM client_product WHERE client_id='".$_SESSION['client_ident']."'");
-		$pagin = new Pagination();
+		/*$pagin = new Pagination();
 		$pagin->nr  = $database->dbNumRows($resultUser);
-		$pagin->itemsPerPage = 20;
+		$pagin->itemsPerPage = 20;*/
 		
-		$myservices = Cproduct::find_by_sql("SELECT * FROM client_product WHERE client_id='".$_SESSION['client_ident']."'".$pagin->pgLimit($pn));
+		$myservices = Cproduct::find_by_sql("SELECT * FROM client_product WHERE client_id='".$_SESSION['client_ident']."'");
 		
-		$index_array =array( "myservices"=>$myservices,"mypagin"=>$pagin->render($pg));
+		$index_array =array( "myservices"=>$myservices,"mypagin"=>"");
 		return $index_array;
 	}
+
+        public function activate(){
+            global $database;
+            $error = array();
+            $activate = new Activation();
+
+            $input = $_REQUEST;
+
+                if(isset($_POST["contact_name"])){
+                    if($_POST['contact_name'] != ""){
+                        $activate->contact_name = $_POST['contact_name'];
+                    }
+                    else array_push($error,"Contact Name");
+                }else array_push($error,"Contact Name");
+            if(isset($_POST["terminal_id"])){
+                if($_POST['terminal_id'] != ""){
+                    $activate->contact_name = $_POST['terminal_id'];
+                }
+                else array_push($error,"Terminal ID");
+            }else array_push($error,"Terminal ID");
+
+            if(empty($error)){
+                if(!empty($input)){
+                    foreach($input as $key=>$value){
+                        $activate->$key = $value;
+                    }
+                    $activate->client_id = $_SESSION['client_ident'];
+                }
+                if($activate->create()){
+                    return 1;     //returns 1 on success
+                }else{
+                    return 2; //unexpected Error
+                }
+            }else{
+               /* $message = "Please check the following errors: ";
+                $lenght = count($error);
+                for($i = 0; $i < $lenght; $i++){
+                    $message = $message.$error[$i].", ";
+                }
+                echo "<div data-alert class='alert-box error'><a href='#' class='close'>&times;</a>$message</div>";*/
+
+                return 3;
+
+            }
+        }
         
         public function getData(){
     		global $database;
     		$depts 			= Department::find_all();
     		$role			= Roles::find_all();
+            $products        = Product::find_all();
     		$country 		= Country::find_all();
             $services 		= Cproduct::find_by_client($_SESSION["client_ident"]);
             $countAcc       = count(Cproduct::find_by_client($_SESSION["client_ident"]));
-            $schedule       =  Cproduct::getNextSchedule($_SESSION["client_ident"]);
+            $schedule       = Cproduct::getNextSchedule($_SESSION["client_ident"]);
             $countTic       = count(Ticket::find_by_client($_SESSION['client_ident']));
     		$zone 			= Zone::find_by_sql("SELECT * FROM zone");
-    		$startups 		= array("departs"=>$depts,"country"=>$country,"zone"=>$zone,"vendors"=>$vendors,"role"=>$role,"countProd"=>$countAcc,"countTick"=>$countTic,"Schel"=>$schedule);
+    		$startups 		= array("departs"=>$depts,"country"=>$country,"zone"=>$zone,"role"=>$role,"countProd"=>$countAcc,"countTick"=>$countTic,"Schel"=>$schedule,"products"=>$products);
     		return $startups;		
     	}
-		
+
 		public function search(){
 			$myservices = Cproduct::search(strip_tags($_POST['product']), strip_tags($_POST['serial_no']), strip_tags($_POST['location']), $_POST['date'], $_SESSION['client_ident']);
 		

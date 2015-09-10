@@ -352,7 +352,7 @@ class Clientproduct_Model extends Model{
             $thisclientproduct  =   Cproduct::find_by_id((int)preg_replace('#[^0-9]#i','',$_POST['cid']));
             $postable = $_POST['sdate'];
             $thisclientproduct->last_maint_date     =   $postable;
-            
+            $weekendSatInterval="";
             $date = new DateTime($postable);
             $interval = new DateInterval('P3M');
             $date->add($interval);
@@ -379,7 +379,9 @@ class Clientproduct_Model extends Model{
             " This is to notify you ahead of time</p> <br /> <strong>Thanks</strong>";
             if($thisclientproduct->update()){
                 $cemail =   array("iarowolo@roberjohnsonholdings.com","iarowolo@gmail.com");
+                //$cemail =   $thisclientproduct->
                 $client  = $this->getClientByID($thisclientproduct->client_id);
+                array_push($cemail,$client->contact_email);
                 array_push($cemail,$client->email);
                 
                 $this->sendMail("Robert Johnson Holdings Ltd","Next Quarterly Maintenance Schedule",$msg,$cemail);
@@ -396,15 +398,13 @@ class Clientproduct_Model extends Model{
             $thisclientproduct                      =   Cproduct::find_by_id((int)preg_replace('#[^0-9]#i','',$_POST['cid']));
             $thisemployee                           =   Employee::find_by_id((int)preg_replace('#[^0-9]#i','',$_POST['empid']));
             $thisSchedule                           =   new Schedule();
+            $clientTicket                           =   Ticket::find_by_id($id);
        
             $thisSchedule->emp_id                   =   $_POST['empid'];
         	$thisSchedule->emp_name                 =   $thisemployee->emp_fname." ". $thisemployee->emp_lname;
         	$thisSchedule->client_id                =   $thisclientproduct->client_id;
             $thisClient                             =   Client::find_by_id($thisclientproduct->client_id);
-            //print_r($thisclientproduct);
-            //print_r($thisClient);
-            //print_r($thisemployee);
-        	$thisSchedule->prod_id                  =      $_POST['cid'];
+            $thisSchedule->prod_id                  =      $_POST['cid'];
             $thisSchedule->prod_name                =   $thisclientproduct->prod_name;
             /**
              * this is to check if ticket
@@ -417,12 +417,14 @@ class Clientproduct_Model extends Model{
             
         	$thisSchedule->s_date                   =   $_POST['taskdate'];
             $cemail                                 = array();
-        	//$thisSchedule->s_time_in       ;
-        	//$thisSchedule->s_time_out;
+
             
             $cemail                     =       (!empty($_POST['cemail']) && isset($_POST['cemail'])) ? explode(",",$_POST['cemail']) : array('iarowolo@gmail.com');
             
             array_push($cemail,$thisemployee->emp_email,(is_array($partTicket)) ? $partTicket->contact_email : "",$theUser->emp_email,$thisClient->email);
+           array_push($cemail,$clientTicket->contact);
+            array_push($cemail,$thisClient->contact_email);
+            array_push($cemail,$thisClient->email);
             //print_r($cemail);
             $thisSchedule->status                   = "Open";
             $thisSchedule->issue                    =   $_POST["tissue"];
@@ -443,25 +445,29 @@ class Clientproduct_Model extends Model{
             $msg                                    .="<p><strong>Telephone: </strong>".$thisemployee->emp_phone."</p>";
             $msg                                    .="<br /><br /><h4>Scheduled Date</h4> <hr />";
             $msg                                    .="<p><strong>$thisSchedule->s_date</strong></p><br /><br /><br /><br />";
+
+
             
             /**
              * the transaction log is created
              * to ensure that the product already 
              * has history and cannot be deleted
              */
+
             $Tlog2   =   new Transaction();
             $Tlog2->com_id              =   $thisclientproduct->main_id;
             $Tlog2->trans_type          =   "TASK ASSIGNMENT";
             $Tlog2->trans_description   =   "Corrective Maintenance task assigned to ".$thisemployee->emp_fname ." ".$thisemployee->emp_lname."";
             $Tlog2->datecreated         =   date("Y-m-d H:i:s");
             $Tlog2->user_id             =   $_SESSION['emp_ident'];
-            
-            
+
             // print_r($msg);           
             if($thisSchedule->create()){
                 $Tlog2->create();
                 //$thisemployee->emp_phone                
                 sendSms($thisemployee->emp_phone, $smsmsg);
+                sendSms($thisClient->contact_phone,$smsmsg);
+                sendSms($thisClient->phone,$smsmsg);
                 $this->sendMail($thisSchedule->emp_name,$subject,$msg,$cemail);
                 return 1;
             }else{

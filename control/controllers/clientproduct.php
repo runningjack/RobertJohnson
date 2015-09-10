@@ -101,13 +101,21 @@ class Clientproduct extends Controller{
              * ensure that the view is not rendered during
              * when record is being filtered fron the db
              */
-                    if(isset($_POST['areaname'])){
-                        echo $productlist;
-                    }elseif(isset($_POST['rec'])){
-                        echo $productlist;
-                    }else{
-                        $this->view->render("clientproduct/index");
-                    }
+
+        if(Session::getRole()){
+            if(in_array(strtolower(get_class($this)), $_SESSION['emp_role_module'])){
+                if(isset($_POST['areaname'])){
+                    echo $productlist;
+                }elseif(isset($_POST['rec'])){
+                    echo $productlist;
+                }else{
+                    $this->view->render("clientproduct/index");
+                }
+            }else{
+
+                $this->view->render("access/restricted");
+            }
+        }
             		
 	}
     

@@ -995,7 +995,7 @@ $("#clientname").keyup(function(){
      */
     $("#csave").click(function(){
         //console.log($("#cid").val() +" "+ $("#mtype").val() +" "+ $("#taskdate").val() + " "+$("#emp").val())
-        $.ajax({url:"?url=clientproduct/doCreateSchedule/" + $("#disid").val(), type:"POST", data:{cid:$("#cid").val(),mtype:$("#mtype").val(),taskdate:$("#taskdate").val(), empid:$("#emp").val(),tissue:$("#tissue").val(),cemail:$("#cemail").val()},
+        $.ajax({url:"?url=clientproduct/doCreateSchedule/" + $("#disid").val(), type:"POST", data:{cid:$("#cid").val(),mtype:$("#mtype").val(),taskdate:$("#taskdate").val(), empid:$("#emp").val(),tissue:$("#tissue").val(),cemail:$("#cemail").val(),},
          success : function(data){
             $("#searchdata2").html(data)
          }

@@ -1,16 +1,98 @@
+</div>
+</div>
 </div><!--main-->
 
-	<div id="footer">
-		<div class="wrapper">
-			<p>&copy; 2013 <b>Robert Johnson Holdings</b></p>
-		</div><!--wrapper-->
-	</div><!--footer-->
-   
+<footer class="main-footer">
+    <div class="pull-right hidden-xs">
+        <b>Version</b> 2.3.0
+    </div>
+    <strong>Copyright &copy; 2013-2015 <a href="http://robertjohnsontechnologies.com">Robert Johnson Holdings</a>.</strong> All rights reserved.
+</footer>
+<script src="<?php echo DIR_ASSETS; ?>js/jquery-2.0.2.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>js/jquery-ui-1.10.3.min.js"></script>
+<script type="text/javascript" src="public/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="public/js/jquery.form.js"></script>
+
+<script src="public/jquery.min.js"></script>
+<script src="public/js/bootstrap.min.js"></script>
+<script src="public/js/docs.min.js"></script>
+<script src="public/js/dropdowns-enhancement.min.js"></script>
+<script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+
+<script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/jquery.dataTables.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/dataTables.colVis.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/dataTables.tableTools.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/dataTables.bootstrap.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>js/plugin/datatable-responsive/datatables.responsive.min.js"></script>
     
  <script type="text/javascript">
  $(document).ready(function(e){
-    var globals = { 'payment_target':'catchable','amt':0,'transcost':0,'total':0,'mReport':0 };
+
+     /* BASIC ;*/
+     var responsiveHelper_dt_basic = undefined;
+     var responsiveHelper_datatable_fixed_column = undefined;
+     var responsiveHelper_datatable_col_reorder = undefined;
+     var responsiveHelper_datatable_tabletools = undefined;
+
+     var breakpointDefinition = {
+         tablet : 1024,
+         phone : 480
+     };
+
+
+
+     /* END BASIC */
+
+
+     /* COLUMN FILTER  */
+     var otable = $('#datatable_fixed_column').DataTable({
+         //"bFilter": false,
+         //"bInfo": false,
+         //"bLengthChange": false
+         //"bAutoWidth": false,
+         //"bPaginate": false,
+         //"bStateSave": true // saves sort state using localStorage
+         "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6 hidden-xs'f><'col-sm-6 col-xs-12 hidden-xs'<'toolbar'>>r>"+
+             "t"+
+             "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+
+         "autoWidth" : true,
+         "preDrawCallback" : function() {
+             // Initialize the responsive datatables helper once.
+             if (!responsiveHelper_datatable_fixed_column) {
+                 responsiveHelper_datatable_fixed_column = new ResponsiveDatatablesHelper($('#datatable_fixed_column'), breakpointDefinition);
+             }
+         },
+         "rowCallback" : function(nRow) {
+             responsiveHelper_datatable_fixed_column.createExpandIcon(nRow);
+         },
+         "drawCallback" : function(oSettings) {
+             responsiveHelper_datatable_fixed_column.respond();
+         }
+
+     });
+
+     // custom toolbar
+     $("div.toolbar").html('<div class="text-right"></div>');
+
+     // Apply the filter
+     $("#datatable_fixed_column thead th input[type=text]").on( 'keyup change', function () {
+
+         otable
+             .column( $(this).parent().index()+':visible' )
+             .search( this.value )
+             .draw();
+
+     } );
+
+     $("#datatable_fixed_column_filter label").addClass("input-group")
+     $("#datatable_fixed_column_filter label input.form-control").attr("placeholder","Search by any field")
+          /* END COLUMN FILTER */
+
+
+
+
+     var globals = { 'payment_target':'catchable','amt':0,'transcost':0,'total':0,'mReport':0 };
     $('#frmEmp').bind('submit', function(e) {
     	e.preventDefault(); // <-- important
     	$(this).ajaxSubmit({

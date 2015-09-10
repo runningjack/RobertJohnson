@@ -28,17 +28,17 @@ function sendSms($number, $msg){
 		$mobile = preg_replace("/^0{2}/","0",$mobile);
 		$number = $mobile;*/
 		
-		$url = "http://www.smslive247.com/http/index.aspx?cmd=sendquickmsg&owneremail=".urlencode($owner)."&subacct=".urlencode($subacct)."&subacctpwd=".urlencode($subacctPwd)."&message=".urlencode($message)."&sender=".urlencode($sender)."&sendto=".urlencode($number)."&msgtype=0";c
+		//$url = "http://www.smslive247.com/http/index.aspx?cmd=sendquickmsg&owneremail=".urlencode($owner)."&subacct=".urlencode($subacct)."&subacctpwd=".urlencode($subacctPwd)."&message=".urlencode($message)."&sender=".urlencode($sender)."&sendto=".urlencode($number)."&msgtype=0";c
 		
-		$curl = curl_init();
-		curl_setopt($curl,CURLOPT_URL, $url);
+		//$curl = curl_init();
+		//curl_setopt($curl,CURLOPT_URL, $url);
 		
 		//return the transfer as a string 
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); 
+        //curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 		
-		$result = curl_exec($curl);
+		//$result = curl_exec($curl);
 		
-			if($result){
+			/*if($result){
 			$ret = trim($result);
 			$send = split(":",$ret);
 			
@@ -50,7 +50,7 @@ function sendSms($number, $msg){
 			else
            
 				return false;
-		}
+		}*/
 	}
 /************************************
 *****SWF Function extract************

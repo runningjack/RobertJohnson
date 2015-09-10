@@ -46,22 +46,24 @@ if (!function_exists("trace")) {
 			return false;
 		}
 	}*/
+
 	function confirm_query($resultSet){
 		if (!$resultSet) {
-		die( "Query not executed" .mysql_error());
-			}
-		}
+		    die( "Query not executed" .mysql_error());
+        }
+	}
+
 	function dbInsert($sql)
-		{
-			$result = mysql_query($sql);
-			if ($result==1){
-				$message="Record Saved";
+	{
+	    $result = mysql_query($sql);
+		if ($result==1){
+			$message="Record Saved";
 			}
 			else{
-				$message="Unexpected Error! Record not Saved";
-			}
-			return $message;
-		}	
+			$message="Unexpected Error! Record not Saved";
+		}
+		return $message;
+	}
 	function dbNumRows($result){ 
 			return mysql_num_rows($result);
 		}

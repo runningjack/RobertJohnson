@@ -6,7 +6,7 @@ class Login_Model extends Model{
 		
 	}
 	public function passRecovery($email){
-	   if(User::find_by_email($email)){
+	   if(User::find_by_email($email) ){
 	       return true;
 	   }else{
 	       return false;
@@ -16,12 +16,10 @@ class Login_Model extends Model{
     
     public function run($username,$password){
 		global $session;
-		$userReg = User::authenticate($username,$password);
+		$userReg = Clientuser::authenticate($username,$password);
 		if($userReg){
-			$session->login($userReg);
-		
+			$session->Clientlogin($userReg);
             return true;
-            
 		}else{
 		  return false;
 		}		
@@ -31,12 +29,8 @@ class Login_Model extends Model{
 		global $session;
 		$userReg = Client::authenticate($username,$password);
 		if($userReg){
-			
 			$session->Clientlogin($userReg);
-			//echo $_SESSION['client_ident'];
-		//redirect_to("?url=dashboard/index");
             return true;
-            
 		}else{
 		  return false;
 		}		

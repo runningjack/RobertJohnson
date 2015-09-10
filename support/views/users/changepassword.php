@@ -7,7 +7,7 @@
 					<div class="button">
 						<ul>
 							<!--
-<li><a href="#">« Back To Listing</a></li>
+<li><a href="#">ï¿½ Back To Listing</a></li>
 -->
 						</ul>
 					</div><!--button-->
@@ -22,32 +22,35 @@
                 <div id="transalert"></div>
                 <legend>Change Password</legend>
                   <div class="row">
+                      <div class="col-lg-12">
 				    <div class="right-label">
 				    <label>Old Password <span class="red">*</span></label>
 				    </div>
-				    <div>
-				    <input class="col-6" required="required" rel="catchable" name="opword" id="opword" type="password" />
+				    
+				    <input class="form-control" required="required" rel="catchable" name="opword" id="opword" type="password" />
 				    <div id="tm"></div>
 				    </div>
 				  </div>
                   
 				  <div class="row">
+                      <div class="col-lg-12">
 				    <div class="right-label">
 				    <label>New password <span class="red">*</span></label>
 				    </div>
-				    <div>
-				    <input class="col-6" required="required" rel="catchable" name="pword" id="pword" type="password" value="" />
+
+				    <input class="form-control" required="required" rel="catchable" name="pword" id="pword" type="password" value="" />
 				    <div id="tm"></div>
 				    </div>
 				  </div>
 				  
 				  				  
 				  <div class="row">
+                      <div class="col-lg-12">
 				    <div class="right-label">
 				    <label>Re-enter New Password<span class="red">*</span></label>
 				    </div>
-				    <div>
-				    <input  class="col-6" name="pword2" id="pword2" type="password" rel="catchable" value="" />
+
+				    <input  class="form-control" name="pword2" id="pword2" type="password" rel="catchable" value="" />
 				    <div id="costp"></div>
 				    </div>
 				  </div>

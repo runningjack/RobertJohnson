@@ -32,58 +32,26 @@
 </div>
 
 <div class="row">
+   <?php if(Session::getRole()){
+    if(true){
+        $modules = $_SESSION['emp_role_module'];
+        foreach($modules as $module){
+            $thisModule = Modules::find_by_module($module);
+            echo"
+            <div class='large-3  columns'><a href='". $uri->link($module.'/'.$thisModule->link) ."'><div class='".$thisModule->css_class."'>
+             $thisModule->description</div></a>
+            </div>";
+        }
+    }else{
+
+    $this->view->render("access/restricted");
+    }
+    }
+
+   ?>
 
 
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("support/scheduleList") ?>"><div class="panel dashboard-icon products">Task Manager</div></a>
-</div>
 
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("clientproduct/index") ?>"><div class="panel dashboard-icon stock">Clients Products <h4>(<?php echo $this->cproducts ?>)</h4></div></a>
-</div>
-
-
-
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("support/ticketlist") ?>"><div class="panel dashboard-icon role">Tickets</div></a>
-</div>
-
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("clients/index") ?>"><div class="panel dashboard-icon product_cats">Clients <h4>(<?php echo $this->clients ?>)</h4> </div>
-    
-    </a>
-</div>
-
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("support/worksheetlist") ?>"><div class="panel dashboard-icon">Work Sheet</div></a>
-</div>
-
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("products/index") ?>"><div class="panel dashboard-icon">Product</div></a>
-</div>
-
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("vendors/index") ?>"><div class="panel dashboard-icon user">Vendors</div></a>
-</div>
-
-<!--
-<div class="large-3  columns ">
-	<a href="<?php echo $uri->link("stockin/index") ?>"><div class="panel dashboard-icon stock">Stockin</div></a>
-</div>
--->
-
-
-<div class="large-3  columns ">
-	<a href="<?php echo $uri->link("support/signofflist") ?>"><div class="panel dashboard-icon stock">Signoff Form</div></a>
-</div>
-
-
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("prod_cats/index") ?>"><div class="panel dashboard-icon product_cats">Product Cats</div></a>
-</div>
-<div class="large-3  columns ">
-	<a href="<?php echo $uri->link("stockitems/index") ?>"><div class="panel dashboard-icon stock">Stock Items</div></a>
-</div>
 
 </div>
 <div class="row">

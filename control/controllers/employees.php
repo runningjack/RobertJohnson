@@ -10,7 +10,7 @@ class Employees extends Controller{
           exit;
 		}
 	}
-	public function index($mid=1){
+ 	public function index($mid=1){
 		$emplist ="";
 		if(empty($mid)){
 			redirect_to($this->uri->link("error/index"));
@@ -104,17 +104,22 @@ $this->view->myemployee = $emplist;
  * view to render is not called 
  * when doing ajax filter
  */
- 
- 
-if(isset($_POST['empname'])){
-                        echo $emplist;
-                    }elseif(isset($_POST['rec'])){
-                        echo $emplist;
-                    }else{
-                        $this->view->render("employees/index");
-                    }
+       // echo $session->empRole;
 
+        if(Session::getRole()){
+            if(in_array(strtolower(get_class($this)), $_SESSION['emp_role_module'])){
+                if(isset($_POST['empname'])){
+                    echo $emplist;
+                }elseif(isset($_POST['rec'])){
+                    echo $emplist;
+                }else{
+                    $this->view->render("employees/index");
+                }
+            }else{
 
+                $this->view->render("access/restricted");
+            }
+        }
 		
 	}
     public function doEmpRoleUpdate(){
@@ -261,6 +266,7 @@ if(isset($_POST['empname'])){
         $this->view->empref     = $ref;
         $this->view->empnok     =   $nok;
         $this->view->empinst    =   $ins;
+
 		$this->view->render("employees/edit");
 	}
     

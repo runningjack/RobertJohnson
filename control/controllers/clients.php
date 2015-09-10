@@ -14,7 +14,16 @@ class Clients extends Controller
 	public function index(){
 		@$this->loadModel("Clients");
 		$this->view->clients = $this->model->getList();
-		$this->view->render("clients/index");
+
+
+        if(Session::getRole()){
+            if(in_array(strtolower(get_class($this)), $_SESSION['emp_role_module'])){
+                $this->view->render("clients/index");
+            }else{
+
+                $this->view->render("access/restricted");
+            }
+        }
 	}
 	public function edit($id){
 		@$this->loadModel("Clients");

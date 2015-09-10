@@ -19,6 +19,7 @@ class Session {
 	public $message="";
     public $employee_role;
     public $empright;
+    public $emRoles ;
     public $privil = array();
     public $department; //needed to hold the employee department 
 	
@@ -53,7 +54,7 @@ class Session {
 			$this->emp_logged_in             =true;
             $_SESSION['fullname']            =$employee->emp_fname." ".$employee->emp_lname;
 			$_SESSION['emp_role']            =$employee->emp_post;
-            $emRole                          =Roles::find_by_id($employee->emp_post);
+            $this->emRole                          =Roles::find_by_id($employee->emp_post);
             
             if(isset($_POST['remember'])){
                 setcookie("uname",$_POST["username"],time()+60*60*24*30);
@@ -62,10 +63,20 @@ class Session {
             $depart                          =Department::find_by_id($employee->emp_dept);
             //print_r(($depart));
             $this->department               =$depart->dept_name;
-            $this->empright                 =   $emRole->role_name;
+            $this->empright                 =   $this->emRole->role_name;
             
 		}
 	}
+
+    public static   function allModules(){
+        $roles = Roles::find_all();
+        $mRole = array();
+        foreach($roles as $role){
+            $mRole = $role->module;
+
+        }
+        return $mRole;
+    }
     
     
     public function Clientlogin($client){
@@ -77,12 +88,25 @@ class Session {
 	}
 
    
-	
+	/*Gets The Role id of the employee*/
 	public static function  getRole(){
 		$userRole= array();
-		$use = User::find_by_id($_SESSION['user_ident']);
-		$userRole = explode(",",$use->user_role);
-		return $userRole;
+        if(isset($_SESSION['user_ident'])){
+            $use = User::find_by_id($_SESSION['user_ident']);
+            if($use){
+                $userRole = explode(",",$use->user_role);
+            }
+            return $userRole;
+        }elseif(isset($_SESSION['emp_ident'])){
+            $myrole ="";
+            $emp = Employee::find_by_id($_SESSION['emp_ident']);
+            if($emp){
+                $myrole = $emp->emp_post;
+            }
+            return $myrole;
+        }else{
+            return false;
+        }
 	}
 	
 	public function logout(){

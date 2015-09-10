@@ -2,31 +2,38 @@
 
 class Cproduct{
 
-	protected static $table_name="client_product";
-	protected static $db_fields=array("id","terminal_id","atm_type","client_id","client_name","prod_id","prod_name","prod_serial","prod_ISDN","install_address","install_country","install_state","install_city","install_status","selling_price","datecreated","datemodified","sign_off_date","last_maint_date","next_maint_date");
-	public $id;
+    protected static $table_name="client_product";
+    protected static $db_fields=array("id","main_id","terminal_id","client_id","client_name","prod_id","prod_name","prod_serial","prod_ISDN","install_address","install_country","install_state","install_area_id","install_area","install_city","install_status","branch","os","atm_type","selling_price","datecreated","datemodified","sign_off_date","last_maint_date","next_maint_date");
+
+    public $id;
+    public $main_id;
+    public $client_id;
     public $terminal_id;
+    public $client_name;
+    public $prod_id;
+    public $prod_name;
+    public $prod_serial;
+    public $prod_ISDN;
+    public $install_address;
+    public $install_country;
+    public $install_state;
+    public $install_area_id;
+    public $install_area;
+    public $install_city;
+    public $install_status;
+    public $status;
+    public $branch;
+    public $os;
     public $atm_type;
-	public $client_id;
-	public $client_name;
-	public $prod_id;
-	public $prod_name;
-	public $prod_serial;
-	public $prod_ISDN;
-	public $install_address;
-	public $install_country;
-	public $install_state;
-	public $install_city;
-	public $install_status;
-	public $status;
     public $selling_price;
-	public $datecreated;
-	public $datemodified;
+    public $datecreated;
+    public $datemodified;
     public $sign_off_date;
     public $last_maint_date;
     public $next_maint_date;
 
-	public static function find_all(){
+
+    public static function find_all(){
 
 		global $database;
 
@@ -38,11 +45,16 @@ class Cproduct{
 
 
 	public static function find_by_id($id){
-		global $database;
-		$result_array =self::find_by_sql("SELECT * FROM ".self::$table_name." WHERE id=".$id);
-		return !empty($result_array) ? array_shift($result_array) : false;
-	}
+    global $database;
+    $result_array =self::find_by_sql("SELECT * FROM ".self::$table_name." WHERE id=".$id);
+    return !empty($result_array) ? array_shift($result_array) : false;
+}
 
+    public static function find_by_terminal($id){
+        global $database;
+        $result_array =self::find_by_sql("SELECT * FROM ".self::$table_name." WHERE terminal_id='".$id."'");
+        return !empty($result_array) ? array_shift($result_array) : false;
+    }
 	
 
 	public static function find_by_client($id){

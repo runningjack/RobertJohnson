@@ -4,13 +4,13 @@
 				
 				
 <div class="heading"><h2>Products &amp; Services</h2>
-					<div class="button">
+					<!--<div class="button">
 						<ul>
 							<li><a data-toggle="modal" data-target="#myModal">
   Search
 </a></li>
 						</ul>
-					</div>
+					</div>-->
 				</div><!--button-->
                 
                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

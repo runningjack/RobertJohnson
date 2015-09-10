@@ -22,7 +22,7 @@ class Supportticket extends Controller{
         $uri = new Url("");
         $ticketlist .="
 		".$datum['mypagin']."
-		<table class='table table-bordered'>
+		<table class='table table-striped table-bordered' width='100%' id='datatable_fixed_column'>
 			<thead><tr>
 				<th width='15%'>Date Created</th><th width='10%'>Ticket ID</th><th width='40%'>Subject</th><th width='5%'>Status </th><th width='10%'>Department </th><th width='10%'>Last Reply</th><th width='10%'></th>
 			</tr>
@@ -33,7 +33,14 @@ class Supportticket extends Controller{
 				  $x =1;
 				foreach($this->view->mytickets as $ticket){
 				$ticketlist .="<tr>
-					<td>".date_format(new DateTime($ticket->datecreated),"M d Y g:ia")."</td><td>$ticket->id</td><td>$ticket->subject </td><td>$ticket->status</td><td>$ticket->department</td><td>".date_format(new DateTime($ticket->datemodified),"M d Y g:ia")."</td><td><a href='".$uri->link("supportticket/detail/".$ticket->id."")."'>View Ticket</a></td>
+					<td>".date_format(new DateTime($ticket->datecreated),"M d Y g:ia")."</td><td>$ticket->id</td><td>$ticket->subject </td><td><span class='";
+                    if(strtolower($ticket->status) == "open"){
+                        $ticketlist .=" label bg-red ";
+                    }elseif(strtolower($ticket->status) == "closed"){
+                        $ticketlist .=" label bg-green ";
+                    }elseif(strtolower($ticket->status) == "admin reply"){
+                        $ticketlist .=" label bg-blue ";
+                    } $ticketlist .="'>"; $ticketlist .= $ticket->status =="Admin Reply" ? "Pending" : $ticket->status ; $ticketlist .="</span></td><td>$ticket->department</td><td>".date_format(new DateTime($ticket->datemodified),"M d Y g:ia")."</td><td><a href='".$uri->link("supportticket/detail/".$ticket->id."")."'>View Ticket</a></td>
 				</tr>";
 				$x++;
 				}
@@ -57,7 +64,8 @@ class Supportticket extends Controller{
 		}
         $datum = $this->model->getData();
         $this->view->country 	= 	$datum['country'];
-		$this->view->issues		=	$datum['issues']; 
+		$this->view->issues		=	$datum['issues'];
+        $this->view->products  = $datum['products'];
 		$this->view->render("supportticket/create");
 	}
 	
@@ -66,6 +74,7 @@ class Supportticket extends Controller{
         $datum = $this->model->getData();
         //$this->view->state = $datum['state'];
         $this->view->country = $datum['country'];
+        $this->view->products  = $datum['products'];
 		//$this->view->mymenu = $this->model->getById($id);
 		$this->view->render("supportticket/create");
 	}
@@ -77,6 +86,7 @@ class Supportticket extends Controller{
         //$this->view->state = $datum['state'];
         $uri = new Url("");
         $ticket = $replyData['ticket'];
+        $this->view->products  = $datum['products'];
         $replies    =   $replyData["replies"];
         $this->view->country = $datum['country'];
 		//$this->view->mymenu = $this->model->getById($id);
@@ -103,7 +113,7 @@ class Supportticket extends Controller{
 		                <td width='39%'>
 		                    <label>Name</label>
 		                  
-		                    <input type='text'  name='cname' id='cname' value='".$ticket->contact_name."' />
+		                    <input type='text' class='form-control'  name='cname' id='cname' value='".$ticket->contact_name."' />
                             <input type='hidden' id='disid' name='disid' value='".$ticket->id."' />
 	                      </td>
 		                <td width='20%'></td>
@@ -111,7 +121,7 @@ class Supportticket extends Controller{
 		                  
 		                    <label>Email <span class='red'>*</span></label>
 	                      
-		                    <input type='email'   name='email' id='email' value='".$ticket->contact_email."' />
+		                    <input type='email' class='form-control'   name='email' id='email' value='".$ticket->contact_email."' />
 		                    <div id='tm2'></div>
 	                      </td>
                   </tr>
@@ -123,16 +133,16 @@ class Supportticket extends Controller{
 		                <td>&nbsp;</td>
                   </tr>
 		              <tr>
-		                <td>Issue</td>
+		                <td>Reply</td>
 		                <td>&nbsp;</td>
 		                <td>&nbsp;</td>
                   </tr>
 		              <tr>
-		                <td colspan='3'><textarea  name='issue' id='issue' ></textarea></td>
+		                <td colspan='3'><textarea class='form-control'  name='issue' id='issue' ></textarea></td>
                   </tr>
 		              <tr>
 		                <td><label for='fupload'>Attach file</label>
-                        <input type='file' name='fupload' id='fupload'></td>
+                        <input type='file' class='form-control' name='fupload' id='fupload'></td>
 		                <td>&nbsp;</td>
 		                <td>&nbsp;</td>
                   </tr>

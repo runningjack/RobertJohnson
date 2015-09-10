@@ -22,6 +22,10 @@ class Dashboard extends Controller{
         $this->view->myAccount = $this->model->getById($_SESSION["client_ident"])   ;
         $this->view->prodcount =$datumo["countProd"];
         $this->view->tickcount =$datumo["countTick"];
+        $this->view->tickopencount = $datumo["CountOpent"];
+        $this->view->tickpendingcount = $datumo["CountPending"];
+        $this->view->tickclosedcount = $datumo["CountClosed"];
+        $this->view->usercount = $datumo["CountUsers"];
         $this->view->schedule = $datumo["Schel"];
 		//$this->view->render("account/index");
 		$this->view->render("dashboard/index");

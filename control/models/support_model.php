@@ -189,7 +189,7 @@
             $newReply->datecreated      =       date("Y-m-d H:i:s");
             $cemail                     =       (!empty($_POST['cemail'])) ? explode(",",$_POST['cemail']) : "";
             
-            $partTicket                 = Ticket::find_by_id($id);
+            $partTicket                 =       Ticket::find_by_id($id);
            // print_r($partTicket);
                 array_push($cemail,$partTicket->contact_email,$theUser->emp_email);
                 $client                     =       Client::find_by_id($partTicket->client_id);
@@ -198,7 +198,7 @@
                 $partTicket->datemodified   = date("Y-m-d H:i:s");
                 //print_r($cemail);
                 //mail("amedora09@gmail.com","Robert Johnson Holdings, Technical Support" , "all good");
-                $this->sendMail($newReply->sender_name,"Robert Johnson Holdings(Technical Support)" ,$newReply->message,$cemail);
+               // $this->sendMail($newReply->sender_name,"Robert Johnson Holdings(Technical Support)" ,$newReply->message,$cemail);
                 
                 /**
                  * Section to enter transaction log

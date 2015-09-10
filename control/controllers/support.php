@@ -418,7 +418,7 @@ class Support extends Controller{
          $client = $this->model->getClientByID($cprod->client_id);
         
          $signofflisting .=$client->name;
-         $signofflisting .="</td><td>$signoff->status </td><td>$vendor->employee_id</td><td>$signoff->client_remark</td><td>".date_format(new DateTime($signoff->datecreated),"M d Y H:i:s")."</td>";
+         $signofflisting .="</td><td>$signoff->status </td><td>$signoff->employee_id</td><td>$signoff->client_remark</td><td>".date_format(new DateTime($signoff->datecreated),"M d Y H:i:s")."</td>";
         
         
         /**
@@ -489,9 +489,7 @@ $this->view->myvends = $signofflisting;
         $this->view->render("support/addsignoff");
     }
     
-    
 
-    
     public function addnewws(){
         @$this->loadModel("Support");
         $retumo                 =   $this->model->getData();

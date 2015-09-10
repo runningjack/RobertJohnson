@@ -1,11 +1,12 @@
 <?php
 class Cproduct{
 	protected static $table_name="client_product";
-	protected static $db_fields=array("id","main_id","client_id","client_name","prod_id","prod_name","prod_serial","prod_ISDN","install_address","install_country","install_state","install_area_id","install_area","install_city","install_status","branch","os","atm_type","selling_price","datecreated","datemodified","sign_off_date","last_maint_date","next_maint_date");
+	protected static $db_fields=array("id","main_id","terminal_id","client_id","client_name","prod_id","prod_name","prod_serial","prod_ISDN","install_address","install_country","install_state","install_area_id","install_area","install_city","install_status","branch","os","atm_type","selling_price","datecreated","datemodified","sign_off_date","last_maint_date","next_maint_date");
 	
 	public $id;
     public $main_id;
 	public $client_id;
+    public $terminal_id;
 	public $client_name;
 	public $prod_id;
 	public $prod_name;

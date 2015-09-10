@@ -52,13 +52,20 @@ class Login extends Controller{
 	   @$this->loadModel("Login");
 		$username = $_POST["username"];
 		$password = $_POST["password"];
-		if($this->model->runClient($username,$password)){
-		      //redirect_to($this->uri->link("dashboard/index"));
-              //exit;
-              echo 1;
-		}else{
-		      echo 2;
-		}
+        if(strtolower($_POST["userole"]) === "admin"){
+            if($this->model->runClient($username,$password)){
+                echo 1;
+            }else{
+                echo 2;
+            }
+        }elseif(strtolower($_POST["userole"]) === "standard user"){
+            if($this->model->run($username,$password)){
+                echo 1;
+            }else{
+                echo 2;
+            }
+        }
+
 		  
 		
 	}
@@ -68,6 +75,7 @@ class Login extends Controller{
         @$this->loadModel("Login");
 		$username = $_POST["username"];
 		$password = $_POST["password"];
+
 		if($this->model->runClient($username,$password)){
 		
 		echo 1;

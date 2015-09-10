@@ -13,7 +13,14 @@ class Contact extends Controller{
 	public function index(){
 		@$this->loadModel("Contact");
 		$this->view->mymenus = $this->model->getList();
-		$this->view->render("contact/index");
+        if(Session::getRole()){
+            if(in_array(strtolower(get_class($this)), $_SESSION['emp_role_module'])){
+                $this->view->render("contact/index");
+            }else{
+
+                $this->view->render("access/restricted");
+            }
+        }
 	}
 	public function detail($id){
 		@$this->loadModel("Contact");

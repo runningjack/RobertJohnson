@@ -1,75 +1,89 @@
-<div class="wrapper">
-
-			<div class="container">
-            
-            <div class="row">
-
-    <div class="col-6">
-        <div class="internalpadding">
-
-            <div class="page-header">
-                <div class="styled_title">
-                    <h2>Account Information &nbsp;&nbsp;&nbsp;<small><a href="<?php echo $uri->link("account/edit") ?>">Update Your Details</a></small></h2>
-                </div>
-            </div>
-            <p><strong><?php global $session; echo  $session->fullname ." (". $this->myAccount->name .")"; ?> </strong></p>
-            <p><?php $this->myAccount->addy ?></p>
-            <p>Ikeja, Lagos, 2341</p>
-            <p>Nigeria</p>
-            <p><a href="mailto:<?php $this->myAccount->email ?>"><?php $this->myAccount->email ?></a></p>
-        </div>
-    </div>
-    <div class="col-6">
-        <div class="internalpadding">
-
-            <div class="page-header">
-                <div class="styled_title">
-                    <h2>Account Overview</h2>
-                </div>
-            </div>
-
-            <p>Number of Products/Services: <a href="<?php echo $uri->link("services/index") ?>"><strong><?php echo $this->prodcount ?></strong> - View &raquo;</a></p>
-            <p>Number of Support Tickets: <a href="<?php echo $uri->link("supportticket/index") ?>"><strong><?php echo $this->tickcount ?></strong> - View &raquo;</a></p>
-             
-        </div>
-    </div>
-</div>
 
 <div class="row">
-<div class=" col-8 small_container">
-				
-				<div class="block">
-					<div class="smaller_heading">
-					<h2>Services</h2>
-					</div><!--heading-->
-					<div class="content">
-						<p><div class="styled_title"><h3>Schedule Preventive Maintenance Date</h3></div>
-                        <?php
-                            if(count($this->schedule) >0){
-                                echo "<table class='pure-table'  width='100%'>
-                    			<thead><tr>
-                    				<th width='20%'>Prod Name</th><th width='30%'>Location</th><th width='20%'>Schedule Date</th><th width='20%'>Engineer</th>
-                    			</tr>
-                    			</thead>
-                    			<tbody>";
-                                foreach($this->schedule as $sched){
-                                    
-                                    echo"<tr><td>$sched->prod_id, $sched->prod_name</td><td> $sched->install_address $sched->install_state</td><td>". date_format(new DateTime($sched->next_maint_date),"M d Y H:i:s")."</td><td></td></tr>" ;
-                                }
-                               echo "</tbody>
-			                     </table>";
-                            }
-                        ?>
-                        </p>
+    <div class="col-lg-2 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-aqua">
+            <div class="inner">
+                <h3><?php echo $this->prodcount ?></h3>
+                <p>ATM Terminals</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-object-group"></i>
+            </div>
+            <a href="<?php echo $uri->link("services/index") ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div><!-- ./col -->
+    <div class="col-lg-2 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3><?= $this->tickopencount ?></h3>
+                <p>Opened Tickets</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+            </div>
+            <a href="<?php echo $uri->link("supportticket/index") ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div><!-- ./col -->
+    <div class="col-lg-2 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3><?= $this->tickpendingcount ?></h3>
+                <p>Pending Ticket</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            <a href="<?php echo $uri->link("supportticket/index") ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div><!-- ./col -->
+    <div class="col-lg-2 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3><?= $this->tickclosedcount ?></h3>
+                <p>Closed Tickets</p>
+            </div>
+            <div class="icon">
+                <i class="ion ion-pie-graph"></i>
+            </div>
+            <a href="<?php echo $uri->link("supportticket/index") ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div><!-- ./col -->
+    <div class="col-lg-2 col-xs-6">
+              <!-- small box -->
+            <div class="small-box bg-purple">
+                <div class="inner">
+                    <h3><?= $this->tickcount ?></h3>
+                    <p>Total Tickets</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-pie-graph"></i>
+                </div>
+                <a href="<?php echo $uri->link("supportticket/index") ?>" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div><!-- ./col -->
 
-						
-					</div><!--content-->
-				</div><!--block-->
 
-			</div>
-</div><!--end Row -->
-<div class="col-4">
 
-</div>
-			</div><!--container-->
-		</div>
+        <div class="col-lg-2 col-xs-6">
+            <!-- small box -->
+            <div class="small-box bg-teal">
+                <div class="inner">
+                    <h3><?= $this->usercount ?></h3>
+                    <p>Users</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-person-add"></i>
+                </div>
+                <a href="<?= $_SESSION['user_role'] ==="admin" ? $uri->link("users/index") : "#"; ?>" class='small-box-footer'>More info <i class='fa fa-arrow-circle-right'></i></a>
+
+            </div>
+        </div><!-- ./col -->
+
+</div><!-- /.row -->
+
+
+

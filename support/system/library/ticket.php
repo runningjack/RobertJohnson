@@ -2,48 +2,26 @@
 
 	class Ticket{
 
-	   protected static $table_name="support_ticket";
+        protected static $table_name="support_ticket";
+        protected static $db_fields=array("id","main_id","subject","prod_name","terminal_id","client_id","contact_name","contact_email","contact_phone","prod_id","location","priority","department","issue","datecreated","datemodified","status");
 
-	   protected static $db_fields=array("id","terminal_id","atm_type","branch","client_id","contact_name","contact_email","contact_phone","prod_id","prod_name","location","priority","subject","department","issue","datecreated","datemodified","status");
-
-       
-
-       public $id;
-
+        public $id;
+        public $main_id;
         public $terminal_id;
-
-        public $atm_type;
-
-        public $branch;
-
-       public $client_id;
-
-	   public $contact_name;
-
-       public $contact_email;
-
-       public $contact_phone;
-
-       public $prod_id;
-
-	   public $prod_name;
-
-       public $location;
-
-       public $priority;
-
-	   public $subject;
-
-       public $department;
-
-       public $issue;
-
-       public $datecreated;
-
-       public $datemodified;
-
-       public $status;
-
+        public $client_id;
+        public $contact_name;
+        public $contact_email;
+        public $contat_phone;
+        public $subject;
+        public $prod_id;
+        public $location;
+        public $priority;
+        public $prod_name;
+        public $department;
+        public $issue;
+        public $datecreated;
+        public $datemodified;
+        public $status;
        
 
        public static function find_all(){

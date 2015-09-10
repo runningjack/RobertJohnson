@@ -196,10 +196,10 @@ function showMessage(){
                 <li><a href="#"><i class="icon-wrench"></i> Our Mission</a></li>
                 <li><a href="#"> Our Vission</a></li>
                 <li><a href="#"><i class="icon-gift"></i> Our Clientele</a></li>
-                
+
               </ul>
             </li>-->
-            
+
            <!-- <li class="parent">
               <a href="#">Product &amp; Services</a>
               <ul class="sub-menu">
@@ -208,10 +208,10 @@ function showMessage(){
                 <li><a href="#">Counting Machines</a></li>
                 <li><a href="#">Card Printers</a></li>
                 <li><a href="#">Personalization Machines</a></li>
-                
+
               </ul>
             </li>-->
-            
+
                       <li><a href="<?php echo $uri->link("dashboard/doLogout") ?>">Log out</a></li>
           </ul>
         </div>

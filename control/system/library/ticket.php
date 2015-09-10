@@ -1,10 +1,11 @@
 <?php
 	class Ticket{
 	   protected static $table_name="support_ticket";
-	   protected static $db_fields=array("id","main_id","client_id","contact_name","contact_email","contact_phone","prod_id","location","priority","department","issue","datecreated","datemodified","status");
+	   protected static $db_fields=array("id","main_id","terminal_id","client_id","contact_name","contact_email","contact_phone","prod_id","location","priority","department","issue","datecreated","datemodified","status");
        
        public $id;
        public $main_id;
+       public $terminal_id;
        public $client_id;
        public $contact_name;
        public $contact_email;

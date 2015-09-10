@@ -35,41 +35,30 @@ global $session;
     </div>
 </div>
 
+    <div class="row">
+        <?php if(Session::getRole()){
+            if(true){
+                $modules = $_SESSION['emp_role_module'];
+                foreach($modules as $module){
+                    $thisModule = Modules::find_by_module($module);
+                    echo"
+            <div class='large-3  columns'><a href='". $uri->link($module.'/'.$thisModule->link) ."'><div class='".$thisModule->css_class."'>
+             $thisModule->description</div></a>
+            </div>";
+                }
+            }else{
+
+                $this->view->render("access/restricted");
+            }
+        }
+
+        ?>
 
 
 
-<div class="row">
-<div class="large-3 columns">
-	<a href="<?php echo $uri->link("itdepartment/account/".$_SESSION["emp_ident"]) ?>"><div class="panel dashboard-icon users">My Account</div></a>
-</div>
-<div class="large-3 columns">
-	<a href="<?php echo $uri->link("role/index") ?>"><div class="panel dashboard-icon users">Role</div></a>
-</div>
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("support/scheduleList") ?>"><div class="panel dashboard-icon products">Task Manager</div></a>
-</div>
 
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("clientproduct/index") ?>"><div class="panel dashboard-icon stock">Clients Products</div></a>
-</div>
-
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("employees/index") ?>"><div class="panel dashboard-icon users">Employee</div></a>
-</div>
+    </div>
 
 
 
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("clients/index") ?>"><div class="panel dashboard-icon product_cats">Clients</div></a>
-</div>
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("support/signofflist") ?>"><div class="panel dashboard-icon product_cats">Sign Off Form</div></a>
-</div>
 
-<div class="large-3  columns">
-	<a href="<?php echo $uri->link("support/worksheetlist") ?>"><div class="panel dashboard-icon">Work Sheet</div></a>
-</div>
-
-</div>
-
-</div><!--End column eight-->

@@ -43,7 +43,15 @@ $vendorlist .= "</tbody>
 </table>";
 
 $this->view->myvends = $vendorlist;
-		$this->view->render("vendors/index");
+
+        if(Session::getRole()){
+            if(in_array(strtolower(get_class($this)), $_SESSION['emp_role_module'])){
+                $this->view->render("vendors/index");
+            }else{
+
+                $this->view->render("access/restricted");
+            }
+        }
 	}
     
   public function create(){

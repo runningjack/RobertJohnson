@@ -19,9 +19,9 @@
         </div>
         <div class="large-9 columns">
             
-            <select  name="mtype" id="mtype"    >
-                
+            <select  name="mtype" id="mtype">
                 <option value="Corrective"> Corrective Maintenance </option>
+                <option value="Preventive"> Preventive Maintenance </option>
             </select>
         </div>
         
