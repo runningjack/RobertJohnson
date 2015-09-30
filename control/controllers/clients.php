@@ -38,10 +38,13 @@ class Clients extends Controller
 		$value = $this->model->create();
 		if($value===1){
 			echo"<div data-alert class='alert-box success'>Record Saved <a href='#' class='close'>&times;</a></div>";
+            redirect_to($this->uri->link("clients/index"));
 		}elseif($value === 2){
 			echo"<div data-alert class='alert-box alert'>Record not Saved <a href='#' class='close'>&times;</a></div>";
+            redirect_to($this->uri->link("clients/create"));
 		}else{
 			echo"<div data-alert class='alert-box alert'>Unexpected Error! Record not Saved <a href='#' class='close'>&times;</a></div>";
+            redirect_to($this->uri->link("clients/create"));
 		}
 	}
 	public function doUpdate(){

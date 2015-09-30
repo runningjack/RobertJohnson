@@ -2,22 +2,22 @@
 <div class="panel callout">
 	<h4 style="display:inline">Maintain Employee Record</h4>
     <a href="<?php echo $uri->link("employees/index") ?>"><span class="button secondary right" style="display:inline"> &laquo;Back To Listing</span></a>
-    <a href="<?php 
-    global $session; 
+    <?php
+    global $session;
     //echo $session->department;
     //print_r($session->privil);
-    
+
     if($session->department=="Technical Department" && in_array("itdepartment", $session->privil) && $session->rolename=="Customer Support Engineer"){
-        echo $uri->link("dashboard/index");
+        echo" <a href='".  $uri->link("dasboard/index")."'><span class='btn btn-primary button right' style='display:inline'> &laquo;Back To Dashboard</span></a>";
     }elseif($session->rolename=="Customer Support Service" && in_array("support", $session->privil)){
-        echo $uri->link("dashboard/index");
+        echo" <a href='".  $uri->link("dashboard/index")."'><span class='btn btn-primary button right' style='display:inline'> &laquo;Back To Dashboard</span></a>";
     }elseif(($session->department=="Humman Resource" || $session=="Human Resource Deparment")){
-        
+
     }elseif((($session->rolename=="Super Admin") || $session->rolename=="General Manager") && $session->department=="Technical Department"){
-        echo $uri->link("dashboard/index");       
+        echo" <a href='".  $uri->link("dashboard/index") ."'><span class='btn btn-primary button right' style='display:inline'> &laquo;Back To Dashboard</span></a>";
     }
-     
-    ?>"><span class="btn btn-primary button right" style="display:inline"> &laquo;Back To Dashboard</span></a>
+
+    ?>
 </div>
 
 <div id="myModal" class="reveal-modal medium" data-animation="fade" style="background-image: linear-gradient(0deg, #f2f9fc, #addcf0 20.0em); border-radius:5px">
@@ -59,7 +59,7 @@
 
 
 
-<form action="<?php echo $uri->link("employees/doUpdate/") ?>" method="post"  name="frmEmp"  id="frmEmp" >
+<form action="<?php echo $uri->link("employees/doUpdate") ?>" method="post"  name="frmEmp"  id="frmEmp" >
 <input type="hidden" id="empid" name="empid" value="<?php echo $this->employee->id ?>"/>
 <input type="hidden" id="staffid" name="staffid" value="<?php echo $this->employee->emp_id ?>"/>
 <div id="transalert"></div>

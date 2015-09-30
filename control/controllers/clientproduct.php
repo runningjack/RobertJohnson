@@ -25,16 +25,16 @@ class Clientproduct extends Controller{
         global $session;
         $uri = new Url("");
         
-        $productlist .="<div class='row'><div class='large-12 columns'>".$datum['mypagin']; $productlist .="</div></div><div class='row'><div class='large-12 columns'><table  width='100%'>
+        $productlist .="<div class='row'><div class='large-12 columns'>"; $productlist .="</div></div><div class='row'><div class='large-12 columns'><table  id='dt_basic'>
             <thead><tr>
-            	<th>S/N</th><th>Product </th><th>Client</th><th>Location</th><th>City </th><th></th><th></th>";
+            	<th>S/N</th><th>Terminal ID</th><th>Product </th><th>Client</th><th>Location</th><th>City </th><th></th><th></th>";
                 /**
                  * check for priviledge
                  * for logged in users
                  * at table level
                  */
                 
-            $productlist .="</tr>
+            $productlist .="<td></td></tr>
             </thead>
             <tbody>";
             
@@ -42,7 +42,7 @@ class Clientproduct extends Controller{
             	  $x =1;
                 foreach($this->view->myclientsproducts as $products){
                 $productlist .="<tr>
-                	<td>$x</td><td><a href='".$uri->link("clientproduct/detail/".$products->id)."'>$products->prod_name</a> </td><td>$products->client_name</td><td>$products->install_address</td><td>$products->install_city</td>";
+                	<td>$x</td><td>$products->terminal_id</td><td><a href='".$uri->link("clientproduct/detail/".$products->id)."'>$products->prod_name</a> </td><td>$products->client_name</td><td>$products->install_address</td><td>$products->install_city</td>";
                     
                     foreach($session->employee_role as $erole){
                     //$emodule = Modules::find_by_module($erole->module);
@@ -74,10 +74,10 @@ class Clientproduct extends Controller{
   <div id='secondModal$products->id' class='reveal-modal small' style='background-image: linear-gradient(0deg, #f2f9fc, #addcf0 20.0em); border-radius:5px'>
     <h2>This is a second modal.</h2>
     <hr />
-    <p></p>
+
     <a class='close-reveal-modal closemodal'>&#215;</a>
   </div>
-                            </td>";
+                            </td><td><a <a href='".$uri->link("clientproduct/detail/".$products->id)."'>Schedule</a></td>";
                     
                         }else{
                             $productlist .="<td></td>";
@@ -92,7 +92,7 @@ class Clientproduct extends Controller{
               }
             
             $productlist .= "</tbody>
-            </table></div></div><div class='row'><div class='large-12 columns'>"; $productlist .=$datum['mypagin']."</div><p>&nbsp;</p></div>";
+            </table></div></div><div class='row'><div class='large-12 columns'>"; $productlist .="</div><p>&nbsp;</p></div>";
             
             $this->view->myprods = $productlist;
             
@@ -116,7 +116,6 @@ class Clientproduct extends Controller{
                 $this->view->render("access/restricted");
             }
         }
-            		
 	}
     
     public function create(){
@@ -280,16 +279,21 @@ class Clientproduct extends Controller{
         @$this->loadModel("Clientproduct");
         if($this->model->updateSchedule()){
             echo "<div data-alert class='alert-box success'>Record Saved </div>";
+        }else{
+            echo "<div data-alert class='alert-box success'>Record Not Saved! </div>";
         }
     }
     
     
     public function doCreateSchedule($id=""){
         @$this->loadModel("Clientproduct");
-        if($this->model->createSchedule($id)===1){
+        global $session;
+        if($this->model->createSchedule($id)){
             echo "<div data-alert class='alert-box success'>Record Saved </div>";
-        }elseif($this->model->createSchedule($id)===2){
-            echo "<div data-alert class='alert-box success'>Record not Saved  <br /> Unexpected Error </div>";
+            $_SESSION['message'] = "<div data-alert class='alert-box success'>Record Saved </div>";
+        }else{
+           // echo "<div data-alert class='alert-box success'>Record not Saved  <br /> Unexpected Error </div>";
+            $_SESSION['message'] = "<div data-alert class='alert-box success'>Record not Saved  <br /> Unexpected Error </div>";
         }
     }
     

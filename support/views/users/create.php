@@ -3,17 +3,21 @@
 		<div class="container">
             <div class="row" style="margin:0; padding:0">
                 <div class="col-12" style="margin:0; padding:0">
-                    <div class="heading"><h2>Create User </h2>
-                        <div class="button">
-                            <ul>
-                                <li><a class="btn btn-info" href="?url=users/index">&laquo; Back to Listing</a></li>
-                            </ul>
-                        </div><!--Ends Button-->
-                    </div><!--Ends Heading-->
+
+                    <div class="row no-print">
+                        <div class="col-xs-12">
+                            <!--<a href="javascript:void(0)" target="_blank" class="btn btn-default"><i class="fa fa-print"></i> Print</a>-->
+                            <a href="<?php echo $uri->link("users/index") ?>" class="btn btn-success pull-right"><i class="fa fa-backward"></i> Back To Listing</a>
+
+                        </div>
+                    </div>
+
                 </div><!--Ends Col-12-->
             </div><!--Ends Row-->
             <div class="row">
             	<div class="col-12">
+                    <h2>Create User </h2>
+                    <div class="transalert"><?php echo (isset($_SESSION['message']) && !empty($_SESSION['message'])) ? $_SESSION['message'] : "" ?></div>
                     <form class="form-horizontal" method="post" id="frmuser" name="frmuser" action="?url=users/doCreate" enctype="multipart/form-data">	
                     	
                         <div class="form-group">
@@ -41,7 +45,7 @@
                             </div>
                          </div>
                         <div class="form-group">
-                            <label for="email" class="col-sm-2 control-label">Email</label>
+                            <label for="email" class="col-sm-2 control-label">Username <small>(Email)</small></label>
                             <div class="col-sm-10">
                               <input type="email" class="form-control" name="email" id="email" placeholder="Email">
                             </div>

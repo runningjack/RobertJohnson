@@ -16,7 +16,7 @@
     ?>"><span class="btn  right  btn-primary button" style="display:inline"> &laquo; Back To Dashboard</span></a>
 </div>
 <div id="transalert"><?php echo (isset($_SESSION['message']) && !empty($_SESSION['message'])) ? $_SESSION['message'] : "" ?></div>
-<div class="row filterbox" >
+<!--<div class="row filterbox" >
     <div class="large-12 columns" >
     
         <div class="large-3 columns">
@@ -35,7 +35,7 @@
             <div id="mySearchContainer" style="position: absolute; background-color: #f58501;">
                     <div id="lcpsearchinner2"></div>
                 </div>
-            <input type="hidden" id="prod_id" name="prod_id" value="<?php  ?>" />
+            <input type="hidden" id="prod_id" name="prod_id" value="<?php /* */?>" />
        
         </div>
         
@@ -67,7 +67,83 @@
         </div>
     </div>
     
+</div>-->
+<div class="row">
+
+    <div class="large-12 columns">
+        <div class="box">
+            <div class="box-header bg-transparent">
+
+                <h3 class="box-title"><i class=""></i>
+                    <span>RECENT <?php echo isset($_GET['status']) ? $_GET['status'] : "" ?> CLIENT TICKETS <?php
+                        if(isset($_GET['clientid'])){
+                         $client =  Client::find_by_id($_GET['clientid']) ;
+                           echo "For ". strtoupper($client->name);
+                        }
+
+
+                        ?></span>
+                </h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body " style="display: block;">
+                <div id='emplisting'>
+                <?php echo $this->myvends; ?>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div id='emplisting'>
-<?php echo $this->myvends; ?>
-</div>  
+
+<script type="text/javascript">
+    (function($) {
+        "use strict";
+        $('#example').dataTable({
+            "order": [
+                [3, "desc"]
+            ]
+        });
+    })(jQuery);
+
+
+
+    (function($) {
+        "use strict";
+        $('#footable-res2').footable().bind('footable_filtering', function(e) {
+            var selected = $('.filter-status').find(':selected').text();
+            if (selected && selected.length > 0) {
+                e.filter += (e.filter && e.filter.length > 0) ? ' ' + selected : selected;
+                e.clear = !e.filter;
+            }
+        });
+
+        $('.clear-filter').click(function(e) {
+            e.preventDefault();
+            $('.filter-status').val('');
+            $('table.demo').trigger('footable_clear_filter');
+        });
+
+        $('.filter-status').change(function(e) {
+            e.preventDefault();
+            $('table.demo').trigger('footable_filter', {
+                filter: $('#filter').val()
+            });
+        });
+
+        $('.filter-api').click(function(e) {
+            e.preventDefault();
+
+            //get the footable filter object
+            var footableFilter = $('table').data('footable-filter');
+
+            alert('about to filter table by "tech"');
+            //filter by 'tech'
+            footableFilter.filter('tech');
+
+            //clear the filter
+            if (confirm('clear filter now?')) {
+                footableFilter.clearFilter();
+            }
+        });
+    })(jQuery);
+</script>

@@ -6,9 +6,70 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
+ <!-- <meta http-equiv="refresh" content="25" />-->
   <title>Robert Johnson Administrative Page</title>
-  <link rel="stylesheet" href="public/css/foundation.css">
+
+  <!--<link rel="stylesheet" href="<?php /*echo DIR_ASSETS; */?>foundation/css/foundation.css">-->
+    <link rel="stylesheet" href="public/css/foundation.css">
+    <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>foundation/css/dashboard.css">
+    <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>foundation/css/style.css">
+    <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>foundation/css/dripicon.css">
+    <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>foundation/css/typicons.css">
+    <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>foundation/css/font-awesome.css">
+    <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>foundation/css/theme.css">
+  <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>css/jquery-ui.min.css">
+  <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>css/jquery-ui.theme.css">
+
+    <!--<link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>foundation/css/foundation.css">-->
+    <!-- iCheck -->
+    <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>plugins/iCheck/flat/blue.css">
+  <link href="http://cdn.datatables.net/1.10.5/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+
+  <link href="<?php echo DIR_ASSETS; ?>foundation/css/footable.core.css?v=2-0-1" rel="stylesheet" type="text/css" />
+  <link href="<?php echo DIR_ASSETS; ?>foundation/css/footable.standalone.css" rel="stylesheet" type="text/css" />
+  <link href="<?php echo DIR_ASSETS; ?>foundation/css/footable-demos.css" rel="stylesheet" type="text/css" />
+
+    <!-- Custom styles for this template -->
+
+
+
+
   <script src="public/js/vendor/custom.modernizr.js"></script>
+
+  <style type="text/css">
+      @import url(http://weloveiconfonts.com/api/?family=fontawesome);
+      .entypo li,
+      .entypo-tooltip li {
+          float: left;
+          height: 5%;
+          padding: 0.5em;
+          position: relative;
+          text-align: center;
+          -webkit-transition: all 0.5s ease;
+          -moz-transition: all 0.5s ease;
+          -o-transition: all 0.5s ease;
+          -ms-transition: all 0.5s ease;
+          transition: all 0.5s ease;
+          width: 10%;
+          list-style: none;
+          font-size: 20px;
+          color: #363E49;
+      }
+      .entypo li:hover,
+      .entypo-tooltip li:hover {
+          color: #000;
+          cursor: pointer;
+      }
+      .your-account h4{
+          font-size: 10px;
+          text-align: center;
+          text-transform: uppercase;
+          font-weight: bold;
+          margin: 10px 0 10px 0;
+          background: rgba(0, 0, 0, 0.24);
+          padding: 5px 0;
+      }
+  </style>
   <style>
   .dash-title{
 	  width:auto;
@@ -190,35 +251,17 @@ function showMessage(){
         <div class="wrapper">
           <ul id="main-menu">
             <li class="current-menu-item"><a href="<?php echo $uri->link("dashboard/index"); ?>">Home</a></li>
-            <!--<li class="parent">
-              <a href="#">About us</a>
-              <ul class="sub-menu">
-                <li><a href="#"><i class="icon-wrench"></i> Our Mission</a></li>
-                <li><a href="#"> Our Vission</a></li>
-                <li><a href="#"><i class="icon-gift"></i> Our Clientele</a></li>
-
-              </ul>
-            </li>-->
-
-           <!-- <li class="parent">
-              <a href="#">Product &amp; Services</a>
-              <ul class="sub-menu">
-                            <li><a href="#">ATMs</a></li>
-                <li><a href="#">POS Terminals</a></li>
-                <li><a href="#">Counting Machines</a></li>
-                <li><a href="#">Card Printers</a></li>
-                <li><a href="#">Personalization Machines</a></li>
-
-              </ul>
-            </li>-->
-
-                      <li><a href="<?php echo $uri->link("dashboard/doLogout") ?>">Log out</a></li>
+            <li class="current-menu-item"><a href="<?php echo $uri->link("employees/index"); ?>">Engineers/Staff</a></li>
+              <li class="current-menu-item"><a href="<?php echo $uri->link("support/schedulelist"); ?>">Technicians & Tasks</a></li>
+              <li class="current-menu-item"><a href="<?php echo $uri->link("support/activationlist"); ?>">Activations</a></li>
+            <li class="current-menu-item"><a href="<?php echo $uri->link("clients/index"); ?>">Clients</a></li>
+            <li><a href="<?php echo $uri->link("dashboard/doLogout") ?>">Log out</a></li>
           </ul>
         </div>
       </nav>
       <div class="clear"></div>
     </div>
-  </header> 
+  </header>
 </div>
 </div><!--Large 12-->
 <div class="clear"></div>

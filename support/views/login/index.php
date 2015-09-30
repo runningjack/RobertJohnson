@@ -7,6 +7,7 @@
 <style>
 	@import url("public/css/resp.css") all and (max-width: 640px);
 </style>
+    <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>dist/css/AdminLTE.min.css">
 <title>Robert Johnson Holdings</title>
 </head>
 
@@ -95,8 +96,11 @@
                         //window.location = "?url=dashboard/index"
                     }
                     if(data===2){
-                        $("#alertme").html("<div data-alert class='alert-box alert'>Invalid username and password combination<a href='#' class='close'>&times;</a></div>");
+                        $("#alertme").html("<div class='alert alert-danger alert-dismissible'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>Invalid username, password or role combination</div>");
                     }
+        if(data===3){
+            $("#alertme").html("<div  class='alert alert-danger alert-dismissible'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>Please select a role</div>");
+        }
     }
 		
 		

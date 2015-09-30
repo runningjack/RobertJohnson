@@ -25,7 +25,7 @@ class Employees extends Controller{
         $this->view->role       =   $datumo['role'];
         $this->view->depts      =   $datumo['departs'];
         $uri = new Url("");
-        $emplist .="<div class='row'><div class='large-12 columns'>".$datum['mypagin']; $emplist .="</div></div><div class='row'><div class='large-12 columns'><table  width='100%'>
+        $emplist .="<div class='row'><div class='large-12 columns'>"; $emplist .="</div></div><div class='row'><div class='large-12 columns'><table id='dt_basic'  width='100%'>
 <thead><tr>
 	<th>Emp ID</th><th>Fullname </th><th>Department </th><th>Post </th><th>Date Employed </th><th></th><th></th>
 </tr>
@@ -94,7 +94,7 @@ class Employees extends Controller{
   }
 
 $emplist .= "</tbody>
-</table></div></div><div class='row'><div class='large-12 columns'>"; $emplist .=$datum['mypagin']."</div><p>&nbsp;</p></div>";
+</table></div></div><div class='row'><div class='large-12 columns'>"; $emplist .="</div><p>&nbsp;</p></div>";
 
 $this->view->myemployee = $emplist;
 

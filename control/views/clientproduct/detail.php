@@ -21,7 +21,7 @@
 </div>
 
 <div id="myModal4" class="reveal-modal medium" data-animation="fade" style="background-image: linear-gradient(0deg, #f2f9fc, #addcf0 20.0em); border-radius:5px" >
-<h4>Set Last Preventive Maintenance Date</h4>
+<h4>Set Preventive Maintenance Date</h4>
 <div id="searchdata"  >
     <div class="large-12 columns">
         <div class="large-3 columns">
@@ -31,17 +31,21 @@
             <input type="hidden" id="cid" name="cid" value="<?php
 	echo $this->myproduct->id;
 ?>" />
+
+            <input type="hidden" id="clientid" name="clientid" value="<?php
+            echo $this->myproduct->client_id;
+            ?>" />
             <input type="date" name="sdate" id="sdate" />
         </div>
     </div>
     
-    <!--
+
 <div class="large-12 columns">
         <div class="large-3 columns">
             <strong>Employee</strong>
         </div>
         <div class="large-9 columns">
-            <select>
+            <select name="empfield" id="empfield">
                 <?php
 				$employees = Employee::find_all();
 				foreach($employees as $emp){
@@ -52,7 +56,7 @@
             </select>
         </div>
     </div>
--->
+
     <div class="large-12 columns">
         <div class="large-3 columns">
         </div>
@@ -63,7 +67,7 @@
 </div>
 <a class="close-reveal-modal"><img src="public/icons/Close16.png" width="16" height="16" /></a>
 </div>
-
+<!--
 
 <div id="myModal5" class="reveal-modal medium" data-animation="fade" style="background-image: linear-gradient(0deg, #f2f9fc, #addcf0 20.0em); border-radius:5px" >
 <h4>Assign Corrective Maintenance Task</h4>
@@ -85,12 +89,12 @@
              
 		                    <div class="row">
 	                      <?php
-						  	if($this->issues){
+/*						  	if($this->issues){
 								foreach($this->issues as $issue){
 									echo"<div class='large-4 columns iss'><label for='".$issue->issue_accronym."'><input type='checkbox' name='".$issue->issue_accronym."' id='".$issue->issue_accronym."' value='".$issue->issue_name."' rel='catchable' />".$issue->issue_name."<label></div>";
 								}
 							}
-						  ?>
+						  */?>
                           </div>
         </div>
         
@@ -121,11 +125,11 @@
         <div class="large-9 columns">
             <select name="emp" id="emp" rel='catchable' >
             	<?php
-					if($this->employee){
+/*					if($this->employee){
 						foreach($this->employee as $emp)
 						echo "<option value='$emp->id'>$emp->emp_id; $emp->emp_fname $emp->emp_lname</option>";
 					}
-				?>
+				*/?>
             </select>
             
         </div>
@@ -143,7 +147,7 @@
 <a class="close-reveal-modal"><img src="public/icons/Close16.png" width="16" height="16" /></a>
 </div>
 
-
+-->
 <div class="row">
 <h3 class="headline4"><?php echo $this->myproduct->prod_name ?></h3>
     <div class="large-4 columns">
@@ -228,3 +232,68 @@
           </section>
   </div>
  </div>
+
+
+
+
+
+
+
+<div id="myModal5" class="reveal-modal medium" data-animation="fade" style="background-image: linear-gradient(0deg, #f2f9fc, #addcf0 20.0em); border-radius:5px" >
+    <h4>Assign Corrective Maintenance Task</h4>
+    <hr />
+    <div id="searchdata2"  >
+        <div class="large-12 columns">
+            <div class="large-3 columns">
+                <strong>Start Date</strong>
+            </div>
+            <div class="large-9 columns">
+                <input type="text" name="taskdate" id="taskdate" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask="">
+            </div>
+            <div class="large-3 columns">
+                <strong>maintenance Type</strong>
+            </div>
+            <div class="large-9 columns">
+                <select  name="mtype" id="mtype">
+                    <option value="Preventive"> Preventive Maintenance </option>
+                    <option value="Corrective"> Corrective Maintenance </option>
+
+                </select>
+            </div>
+            <div class="large-3 columns">
+                <strong>Issue</strong>
+            </div>
+            <div class="large-9 columns">
+                <textarea id="tissue" name="tissue"> <?php echo $this->ticket->issue ?></textarea>
+            </div>
+
+
+            <div class="large-3 columns">
+                <strong>Technician</strong>
+            </div>
+            <div class="large-9 columns">
+                <select name="emp" id="emp">
+                    <?php
+                    $employees = Employee::find_all();
+                    foreach($employees as $emp){
+                        echo "<option value='$emp->id'>$emp->emp_id; $emp->emp_fname $emp->emp_lname</option>";
+                    }
+                    ?>
+                </select>
+
+            </div>
+        </div>
+
+
+        <div class="large-12 columns">
+            <div class="large-3 columns">
+            </div>
+            <div class="large-9 columns">
+                <button class="button" id="csavell" name="csave">Save</button>
+                <input name="disid" id="disid" value="" type="hidden">
+                <input name="cemail" id="cemail" value="" type="hidden">
+            </div>
+        </div>
+    </div>
+    <a class="close-reveal-modal"><img src="public/icons/Close16.png" width="16" height="16" /></a>
+</div>

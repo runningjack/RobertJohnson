@@ -21,7 +21,7 @@
 </div>
 
 <form id="frmAddClient" method="post" action="<?php echo $uri->link("clients/doUpdate") ?>" >
-  <fieldset><div id="transalert"></div>
+  <fieldset><div id="transalert"><?php echo (isset($_SESSION['message']) && !empty($_SESSION['message'])) ? $_SESSION['message'] : "" ?></div>
     <legend>Update Client</legend>
 
     <div class="row">

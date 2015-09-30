@@ -129,7 +129,7 @@ class Users_Model extends Model{
 			$newuser->username			=	$_POST['email'];
 			$newuser->lname				=	$_POST['sname'];
 			$newuser->password			=	$_POST['password'];
-			$newuser->phone				=	"08076525353";//$_POST['phone'];
+			$newuser->phone				=	$_POST['phone'];
 			$newuser->email				=	$_POST['email'];
 			$newuser->company_id		=	$company->id;
 			$newuser->company			=	$company->name;

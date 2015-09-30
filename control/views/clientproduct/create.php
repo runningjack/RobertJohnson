@@ -54,6 +54,16 @@
   </div>
 
 
+     <div class="row">
+         <div class="small-2 columns">
+             <label for="right-label" class="left inline">Terminal ID</label>
+         </div>
+         <div class="small-10 columns">
+             <input type="text" placeholder="Enter Terminal ID" class="six"  name="terminal_id" id="terminal_id" />
+
+         </div>
+     </div>
+
 
   <div class="row">
     <div class="small-2 columns">

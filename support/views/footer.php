@@ -1,7 +1,23 @@
 </div>
 </div>
 </div><!--main-->
+<div class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Modal Default</h4>
+            </div>
+            <div class="modal-body">
+                <p>One fine body…</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
 
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
 <footer class="main-footer">
     <div class="pull-right hidden-xs">
         <b>Version</b> 2.3.0
@@ -19,6 +35,13 @@
 <script src="public/js/dropdowns-enhancement.min.js"></script>
 <script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 
+<script src="<?php echo DIR_ASSETS; ?>plugins/input-mask/jquery.inputmask.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>plugins/input-mask/jquery.inputmask.extensions.js"></script>
+<!-- date-range-picker -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>plugins/daterangepicker/daterangepicker.js"></script>
+
 <script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/jquery.dataTables.min.js"></script>
 <script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/dataTables.colVis.min.js"></script>
 <script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/dataTables.tableTools.min.js"></script>
@@ -27,6 +50,13 @@
     
  <script type="text/javascript">
  $(document).ready(function(e){
+
+     //Datemask dd/mm/yyyy
+     $("#datemask").inputmask("dd/mm/yyyy", {"placeholder": "dd/mm/yyyy"});
+     //Datemask2 mm/dd/yyyy
+     $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
+     //Money Euro
+     $("[data-mask]").inputmask();
 
      /* BASIC ;*/
      var responsiveHelper_dt_basic = undefined;
@@ -176,8 +206,10 @@
         $.ajax({url:"?url=supportticket/doCloseTicket",type:"POST",data:{id:$("#disid").val()},
             success : function(data){
                 $("#divclose").html(data);
+
             }
         })
+        document.location.reload(true);
         return false
     })
     
@@ -211,12 +243,20 @@
 	/* the section is needed 
 	to update the client reply via ajax*/
 	$("#replysave").click(function(){
+
+        $("#transalert").html("<div style=' width:317px; margin:10px auto'><img src='<?php echo DIR_ASSETS;?>img/bigLoader.gif'  ><h2>Sending Reply to RJ Support...Please Wait</h2><div>")
 		$.ajax({url:"?url=supportticket/doCreateClientReply/" + $("#disid").val(), type:"POST", data:{issue:$("#issue").val(),cname:$("#cname").val()},
 		success : function(data){
-			$("#granddiv").html("")
-				$("#granddiv").html(data)
+            $("#granddiv").html(data)
 			}
 		})
+        $("#transalert").html("");
+        $("#issue").val("")
+        $("#hideme").slideToggle();
+        //$("#hideme").html("<div style=' width:317px; margin:10px auto'><img src='<?php echo DIR_ASSETS;?>img/bigLoader.gif'  ><h2>Sending Reply to RJ Support...Please Wait</h2><div>")
+        //$("#hideme").html("<div class='alert alert-success alert-dismissible'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button><h4>	<i class='icon fa fa-check'></i> Alert!</h4>Success alert preview. This alert is dismissable.</div>")
+        // window.location.reload(true);
+       // window.location = window.location.href
 	})
 	/*close client reply ajax section*/
     

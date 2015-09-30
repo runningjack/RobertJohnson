@@ -8,6 +8,7 @@ $uri = new Url("");
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    <!--<meta http-equiv="refresh" content="25" />-->
 <!--<link href="public/css/style2.css" rel="stylesheet" type="text/css"/>-->
 
  <script type="text/javascript" src="public/js/jquery-1.7.2.min.js"></script>
@@ -28,6 +29,8 @@ $uri = new Url("");
     <!-- AdminLTE Skins. Choose a skin from the css/skins
          folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>css/jquery-ui.min.css">
+    <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>css/jquery-ui.theme.css">
     <!-- iCheck -->
     <link rel="stylesheet" href="<?php echo DIR_ASSETS; ?>plugins/iCheck/flat/blue.css">
     <!-- Morris chart -->
@@ -152,7 +155,7 @@ $uri = new Url("");
                     $user = Client::find_by_id($_SESSION['client_ident']);
                     if($_SESSION['user_role'] =="admin"){
 						echo $user->contact_name." | ".$user->name." ";
-                    }elseif($_SESSION['user_role'] =="standard user"){
+                    }elseif(strtolower($_SESSION['user_role']) =="standard user" || strtolower($_SESSION['user_role']) =="standard" ){
                         $me = Clientuser::find_by_id($_SESSION['user_ident']);
                         echo $me->lname." | ".$user->name." ";
                     }
@@ -178,6 +181,7 @@ $uri = new Url("");
                     <li class="dropdown"><a href="#" data-toggle="dropdown">Support Tickets <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li <?php echo get_class()=="supportticket"? 'id="selected"' : ''; ?> ><a href="<?php echo $uri->link("supportticket/index") ?>">View Tickets</a></li>
+                            <li <?php echo get_class()=="supportticket"? 'id="selected"' : ''; ?> ><a href="<?php echo $uri->link("supportticket/activationlist") ?>">View Activation Requests</a></li>
                             <li <?php echo get_class()=="supportticket"? 'id="selected"' : ''; ?> ><a href="<?php echo $uri->link("supportticket/create") ?>">New Ticket</a></li>
                         </ul>
                     </li>
@@ -189,16 +193,18 @@ $uri = new Url("");
                         </ul>
                     </li>
 
-                    <li class="dropdown"><a href="#" data-toggle="dropdown">Account <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
 
-                            <li <?php echo get_class()=="account"? 'id="selected"' : ''; ?>><a href="<?php echo $uri->link("account/edit")?>">Modify Profile</a></li>
-                            <li <?php echo get_class()=="account"? 'id="selected"' : ''; ?>><a href="<?php echo $uri->link("account/changepassword") ?>">Change Password</a></li>
-                        </ul>
-                    </li>
 <?php global $session ;
                     if($_SESSION['user_role'] ==="admin"){
-                    echo "<li class='dropdown'><a href='#' data-toggle='dropdown'>Users <b class='caret'></b></a>
+                    echo "
+                    <li class='dropdown'><a href='#' data-toggle='dropdown'>Account <b class='caret'></b></a>
+<ul class='dropdown-menu'>
+
+                            <li ><a href='". $uri->link("account/edit")."'>Modify Profile</a></li>
+                    <li><a href='". $uri->link("account/changepassword")."'>Change Password</a></li>
+                </ul>
+                </li>
+                    <li class='dropdown'><a href='#' data-toggle='dropdown'>Users <b class='caret'></b></a>
                         <ul class='dropdown-menu'>
                             <li ><a href='".$uri->link("users/create")."'>Create User</a></li>
                             <li ><a href='".$uri->link("users/index")."'>Listing</a></li>

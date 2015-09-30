@@ -13,8 +13,7 @@ class Supportticket_Model extends Model{
 			$purl	=	$_GET['url'];
 			$purl	=	rtrim($purl);
 			$purl	=	explode('/',$_GET['url']);
-			
-			
+
 		}else{
 			$purl =null;	
 		}
@@ -23,22 +22,37 @@ class Supportticket_Model extends Model{
 		}else{
 		$pn = $purl['2'];
 		}
+        $statusfield ="";
+
+        /**
+         * of all the filter fields if only one field is set
+         */
+        $filterResult ="";
+        if(isset($_REQUEST['status']) && !empty($_REQUEST['status'])){
+            if($_GET['status'] != "Pending"){
+                $statusfield .= " AND status = '".$_REQUEST['status']."' ";
+
+            }else{
+
+            } $statusfield .= " AND (status ='Admin Reply' OR status='Customer Reply') ";
+        }
+
+        $filterResult .= " WHERE client_id ='".$_SESSION['client_ident']."' ".$statusfield;
 		global $database;
 		$resultEmployee = $database->db_query("SELECT * FROM support_ticket");
 		$pagin = new Pagination();//create the pagination object;
 		$pagin->nr  = $database->dbNumRows($resultEmployee);
 		$pagin->itemsPerPage = 20;
 		
-		$myitems = Ticket::find_by_sql("SELECT * FROM support_ticket ORDER BY datemodified DESC ".$pagin->pgLimit($pn));
-		
+		$myitems = Ticket::find_by_sql("SELECT * FROM support_ticket  ".$filterResult." ORDER BY datemodified DESC ".$pagin->pgLimit($pn));
+
 			$index_array =array( "supportticket"=>$myitems,
 							"mypagin"=>$pagin->render($pg));
 							return $index_array;
 		
 		return $index_array;
 	}
-    
-    
+
     	public function getListClient($id="",$pg){
 		 $purl = array();
 		if(isset($_GET['url'])){
@@ -55,14 +69,37 @@ class Supportticket_Model extends Model{
 			$pn = 1;
 		}else{
 		$pn = $purl['2'];
+
+
 		}
+
+
+            $statusfield ="";
+
+
+
+            /**
+             * of all the filter fields if only one field is set
+             */
+            $filterResult ="";
+            if(isset($_REQUEST['status']) && !empty($_REQUEST['status'])){
+                if($_REQUEST['status'] !="Pending"){
+                    $statusfield .= " AND status = '".$_REQUEST['status']."' ";
+                }else{
+
+                    $statusfield .= " AND status = 'Admin Reply' OR status = 'Customer Reply'";
+                }
+
+            }
+
+            $filterResult .= " WHERE client_id ='".$_SESSION['client_ident']."' ".$statusfield;
 		global $database;
 		$resultEmployee = $database->db_query("SELECT * FROM support_ticket WHERE client_id='".$_SESSION["client_ident"]."'");
 		$pagin = new Pagination();//create the pagination object;
 		$pagin->nr  = $database->dbNumRows($resultEmployee);
 		$pagin->itemsPerPage = 20;
 		
-		$myitems = Ticket::find_by_sql("SELECT * FROM support_ticket WHERE client_id ='".$_SESSION["client_ident"]."' ORDER BY datemodified DESC ".$pagin->pgLimit($pn)."");
+		$myitems = Ticket::find_by_sql("SELECT * FROM support_ticket ".$filterResult."  ORDER BY datemodified DESC ".$pagin->pgLimit($pn)."");
 		
 			$index_array =array( "supportticket"=>$myitems,
 							"mypagin"=>$pagin->render($pg));
@@ -70,6 +107,57 @@ class Supportticket_Model extends Model{
 		
 		return $index_array;
 	}
+
+
+    public function getListActivation($id="",$pg){
+        $purl = array();
+        if(isset($_GET['url'])){
+
+            $purl	=	$_GET['url'];
+            $purl	=	rtrim($purl);
+            $purl	=	explode('/',$_GET['url']);
+
+
+        }else{
+            $purl =null;
+        }
+        if(!isset($purl['2'])){
+            $pn = 1;
+        }else{
+            $pn = $purl['2'];
+
+
+        }
+        $statusfield ="";
+        /**
+         * of all the filter fields if only one field is set
+         */
+        $filterResult ="";
+        if(isset($_REQUEST['status']) && !empty($_REQUEST['status'])){
+            if($_REQUEST['status'] !="Pending"){
+                $statusfield .= " AND status = '".$_REQUEST['status']."' ";
+            }else{
+
+                $statusfield .= " AND status = 'Admin Reply' OR status = 'Customer Reply'";
+            }
+
+        }
+
+        $filterResult .= " WHERE client_id ='".$_SESSION['client_ident']."' ".$statusfield;
+        global $database;
+        $resultEmployee = $database->db_query("SELECT * FROM activation WHERE client_id='".$_SESSION["client_ident"]."'");
+        $pagin = new Pagination();//create the pagination object;
+        $pagin->nr  = $database->dbNumRows($resultEmployee);
+        $pagin->itemsPerPage = 20;
+
+        $myitems = Activation::find_by_sql("SELECT * FROM activation ".$filterResult."  ORDER BY id DESC ".$pagin->pgLimit($pn)."");
+
+        $index_array =array( "supportticket"=>$myitems,
+            "mypagin"=>$pagin->render($pg));
+        return $index_array;
+
+        return $index_array;
+    }
 	
 	
 	
@@ -97,6 +185,10 @@ class Supportticket_Model extends Model{
 		$startups 		= array("departs"=>$depts,"country"=>$country,"zone"=>$zone,"vendors"=>$vendors,"role"=>$role,"myproducts"=>$myproducts,"issues"=>$issues,"products"=>$products);
 		return $startups;		
 	}
+
+    public function getActivationData($id){
+        return Activation::find_by_id($id);
+    }
     
     public function getTicketData($id=""){
         $replies        =  Ticketreply::find_by_ticket($id);
@@ -125,12 +217,14 @@ class Supportticket_Model extends Model{
             else array_push($error,"Terminal ID");
         }else array_push($error,"Terminal ID");
 
-       /* if(isset($_POST["atm_type"])){
+
+
+       if(isset($_POST["atm_type"])){
             if($_POST['atm_type'] != ""){
                 $newticket->atm_type = $_POST['atm_type'];
             }
             else array_push($error,"ATM TYPE");
-        }else array_push($error,"ATM TYPE");*/
+        }else array_push($error,"ATM TYPE");
 
 
         if(isset($_POST["branch"])){
@@ -156,24 +250,27 @@ class Supportticket_Model extends Model{
 		
 		if(isset($_POST["location"])){
             $newticket->location = $_POST["location"];
-
 		}else array_push($error,"Location");
 
-        /*if(isset($_POST["location"])){
-            $newticket->location = $_POST["location"];
-            $newticket->prod_name = $cid[1];
-        }else array_push($error,"Location");*/
 
 
 		if(isset($_POST["plevel"])){
 			$newticket->priority = $_POST["plevel"];
 		}else array_push($error,"Priority");
-		
+
+
 		
 		
 		if(isset($_POST["issue"])){
 			$newticket->issue = htmlspecialchars($_POST['issue']);
 		}else array_push($error,"Issue");
+
+
+        if(isset($_POST["subject"])){
+            $newticket->subject = htmlspecialchars($_POST['subject']);
+        }else {
+            $newticket->subject = htmlspecialchars($_POST['issue']);
+        }
 		
 		$newticket->department  = $_POST["dept"];
         $newticket->datecreated = $newticket->datemodified = date("Y-m-d H:i:s");
@@ -196,6 +293,7 @@ class Supportticket_Model extends Model{
                         //$cproduct->client_name				=	$_POST["clientname"];
                         $cproduct->prod_id                      =   $_POST['terminal_id'];
                         $cproduct->terminal_id                  =   $_POST['terminal_id'];
+                        $cproduct->prod_name                    =   $_POST['product_name'];
                         $cproduct->branch                       =   $_POST['branch'];
                         $cproduct->atm_type                     =   $_POST['atm_type'];
                         $cproduct->install_status				=	1;
@@ -214,6 +312,7 @@ class Supportticket_Model extends Model{
                         //$cproduct->client_name				=	$_POST["clientname"];
                         $cproduct->prod_id                      =   $_POST['terminal_id'];
                         $cproduct->terminal_id                  =   $_POST['terminal_id'];
+                        $cproduct->prod_name                    =   $_POST['product_name'];
                         $cproduct->branch                       =   $_POST['branch'];
                         $cproduct->atm_type                     =   $_POST['atm_type'];
                         $cproduct->install_status				=	1;
@@ -264,7 +363,7 @@ class Supportticket_Model extends Model{
 				$theCustomer                =       Client::find_by_id($_SESSION["client_ident"]);
 				$newReply->sender_name      =       $theCustomer->name;
 				$newReply->sender_type      =       "Client";
-				$newReply->message          =       $newticket->issue;
+				$newReply->message          =       $ddticket->issue;
 				$newReply->datecreated      =       date("Y-m-d H:i:s");
 				$newReply->create();
 				if(!empty($_POST['ccemail'])){
@@ -308,7 +407,7 @@ class Supportticket_Model extends Model{
             $theCustomer                =       Client::find_by_id($_SESSION["client_ident"]);
             $newReply->sender_name      =       $theCustomer->name;
             $newReply->sender_type      =       "Client";
-            $newReply->message          =       $_POST['issue'];
+            $newReply->message          =       $_POST['subject']." ".$_POST['issue'];
             $newReply->datecreated      =       date("Y-m-d H:i:s");
             if($newReply->create()){
                 $partTicket = Ticket::find_by_id($id);
@@ -395,7 +494,7 @@ class Supportticket_Model extends Model{
 		$message = '
 			<html><body>
 			<h1>Robert Johnson Holdings Limited</h1>
-			<img src="http://www.robertjohnsonholdings.com/public/images/logo.png" alt="Robert Johnson Logo"/>
+
 			<h2>Ticket Number #'.str_pad($ticket->id,8,"0",STR_PAD_LEFT).'</h2>
 				<table width="100%" border="0">
 				  <tr>
@@ -495,7 +594,7 @@ class Supportticket_Model extends Model{
 		$message = '
 			<html><body>
 			<h1>Robert Johnson Holdings Limited</h1>
-			<img src="http://www.robertjohnsonholdings.com/public/images/logo.png" alt="Robert Johnson Logo"/>
+
 			<h2>Ticket Number #'.str_pad($ticket->id,8,"0",STR_PAD_LEFT).'</h2>
 				<table width="100%" border="0">
 				  <tr>

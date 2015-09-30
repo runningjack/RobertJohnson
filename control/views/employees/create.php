@@ -1,22 +1,22 @@
 <div class="panel callout">
 	<h4 style="display:inline">New Employee</h4>
     <a href="<?php echo $uri->link("employees/index") ?>"><span class="button secondary right" style="display:inline"> &laquo;Back To Listing</span></a>
-    <a href="<?php 
-    global $session; 
+    <?php
+    global $session;
     //echo $session->department;
     //print_r($session->privil);
-    
+
     if($session->department=="Technical Department" && in_array("itdepartment", $session->privil) && $session->rolename=="Customer Support Engineer"){
-        echo $uri->link("dashboard/index");
+   echo" <a href='".  $uri->link("dasboard/index")."'><span class='btn btn-primary button right' style='display:inline'> &laquo;Back To Dashboard</span></a>";
     }elseif($session->rolename=="Customer Support Service" && in_array("support", $session->privil)){
-        echo $uri->link("dashboard/index");
+        echo" <a href='".  $uri->link("dashboard/index")."'><span class='btn btn-primary button right' style='display:inline'> &laquo;Back To Dashboard</span></a>";
     }elseif(($session->department=="Humman Resource" || $session=="Human Resource Deparment")){
-        
+
     }elseif((($session->rolename=="Super Admin") || $session->rolename=="General Manager") && $session->department=="Technical Department"){
-        echo $uri->link("dashboard/index");       
+        echo" <a href='".  $uri->link("dashboard/index") ."'><span class='btn btn-primary button right' style='display:inline'> &laquo;Back To Dashboard</span></a>";
     }
-     
-    ?>"><span class="btn btn-primary button right" style="display:inline"> &laquo;Back To Dashboard</span></a>
+
+    ?>
 </div>
     <form action="<?php echo $uri->link("employees/doCreate/") ?>" method="post"  name="frmEmp"  id="frmEmp"  >
      <fieldset><div id="transalert"></div>
@@ -54,10 +54,10 @@
   
   <div class="row">
     <div class="small-2 columns">
-    <label for="right-label" class="left inline">Middlename<span class="red">*</span></label>
+    <label for="right-label" class="left inline">Middlename</label>
     </div>
     <div class="small-10 columns">
-    <input type="text" placeholder="Middle name" class="six" required='required'  name="mname" id="mname" />
+    <input type="text" placeholder="Middle name" class="six"   name="mname" id="mname" />
     <div id="lnm"></div>
     </div>
   </div>
@@ -65,10 +65,10 @@
   
   <div class="row">
     <div class="small-2 columns">
-    <label for="right-label" class="left inline">Date of Birth<span class="red">*</span></label>
+    <label for="right-label" class="left inline">Date of Birth</label>
     </div>
     <div class="small-10 columns">
-    <input type="text" placeholder="Date of Birth" class="six" required='required'  name="dob" id="dob" />
+    <input type="text" placeholder="Date of Birth" class="six"   name="dob" id="dob" />
     </div>
   </div>
   
@@ -88,7 +88,7 @@
   
    <div class="row">
     <div class="small-2 columns">
-    <label for="right-label" class="left inline">Marital Status<span class="red">*</span></label>
+    <label for="right-label" class="left inline">Marital Statu</label>
     </div>
     <div class="small-10 columns">
     <select id="mstatus" name="mstatus">
@@ -124,7 +124,7 @@
     <label for="right-label" class="left inline">Address<span class="red">*</span></label>
     </div>
     <div class="small-10 columns">
-    <textarea id="address" name="address" rows="10" cols="10"></textarea>
+    <textarea id="address" name="address" rows="10" cols="10" required></textarea>
     <div id="add"></div>
     </div>
   </div>
@@ -132,7 +132,7 @@
   
   <div class="row">
     <div class="small-2 columns">
-    <label for="right-label" class="left inline">Nationality<span class="red">*</span></label>
+    <label for="right-label" class="left inline">Nationality</label>
     </div>
     <div class="small-10 columns">
     <select id="nationality" name="nationality">
@@ -145,7 +145,7 @@
   
   <div class="row">
     <div class="small-2 columns">
-    <label for="right-label" class="left inline">State of Origin<span class="red">*</span></label>
+    <label for="right-label" class="left inline">State of Origin</label>
     </div>
     <div class="small-10 columns">
     <select id="soo" name="soo">
@@ -164,7 +164,7 @@
   
   <div class="row">
     <div class="small-2 columns">
-    <label for="right-label" class="left inline">Local Government Area<span class="red">*</span></label>
+    <label for="right-label" class="left inline">Local Government Area</label>
     </div>
     <div class="small-10 columns">
     <select id="lga" name="lga">

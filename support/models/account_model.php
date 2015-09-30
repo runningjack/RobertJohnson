@@ -5,6 +5,8 @@ class Account_Model extends Model{
 	}
     
     public function getById($id){
+
+
 		return Client::find_by_id($id);
        // $myaccount = Accounts::find_by_phone($phone);
        

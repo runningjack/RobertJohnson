@@ -2,13 +2,18 @@
 		<div class="wrapper">
 
 			<div class="container">
-			  <div class="heading">
-				<h2>Add New </h2>
+                <div class="row no-print">
+                    <div class="col-xs-12">
+                        <!--<a href="javascript:void(0)" target="_blank" class="btn btn-default"><i class="fa fa-print"></i> Print</a>-->
+                        <a href="<?php echo $uri->link("supportticket/index") ?>" class="btn btn-success pull-right"><i class="fa fa-backward"></i>Back To Listing</a>
 
-					<div class="button">
-						<ul>
-							<li><a href="<?php $uri->link("supportticket/index") ?>">&laquo; Back To Listing</a></li>
-						</ul>
+                    </div>
+                </div>
+			  <div class="row">
+
+
+					<div class="col-lg-12">
+                        <h2>Ticket Reply </h2>
 					</div><!--button-->
 				</div><!--heading-->
 				                

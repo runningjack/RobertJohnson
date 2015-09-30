@@ -28,40 +28,49 @@ class Clientproduct_Model extends Model{
 		}else{
 		$pn = $purl['2'];
 		}
-        
-        
+
         $prodname ="";
         $clientname ="";
         $areaname ="";
         $regionname ="";
         $atmtype  ="";
-        
-        
-		
+        $clientid ="";
+
         /**
 		 * of all the filter fields if only one field is set
 		 */
          $filterResult ="";
-         if(isset($_POST['prodname']) && !empty($_POST['prodname'])){
-            $prodname .= " AND prod_name = '".$_POST['prodname']."' ";
+         if(isset($_REQUEST['prodname']) && !empty($_REQUEST['prodname'])){
+            $prodname .= " AND prod_name = '".$_REQUEST['prodname']."' ";
          }
-         if(isset($_POST['clientname']) && !empty($_POST['clientname'])){
-            $clientname .= " AND client_name='".$_POST['clientname']."' ";
+
+        if(isset($_REQUEST['prodname']) && !empty($_REQUEST['prodname'])){
+            $prodname .= " AND prod_name = '".$_REQUEST['prodname']."' ";
+        }
+
+        if(isset($_REQUEST['clientid']) && !empty($_REQUEST['clientid'])){
+            $clientid .= " AND client_id ='".$_REQUEST['clientid']."'";
+        }
+
+         if(isset($_REQUEST['clientname']) && !empty($_REQUEST['clientname'])){
+            $clientname .= " AND client_name='".$_REQUEST['clientname']."' ";
          }
          
-         if(isset($_POST['areaname']) && !empty($_POST['areaname'])){
-            $areaname .= " AND install_area='".$_POST['areaname']."' ";
+         if(isset($_REQUEST['areaname']) && !empty($_REQUEST['areaname'])){
+            $areaname .= " AND install_area='".$_REQUEST['areaname']."' ";
          }
-         if(isset($_POST['location']) && !empty($_POST['location'])){
-            $regionname .= " AND (install_city LIKE '%".$_POST['location']."%' OR install_address LIKE '%".$_POST['location']."%') ";
+         if(isset($_REQUEST['location']) && !empty($_REQUEST['location'])){
+            $regionname .= " AND (install_city LIKE '%".$_REQUEST['location']."%' OR install_address LIKE '%".$_REQUEST['location']."%') ";
          }
-         if(isset($_POST['machine']) && !empty($_POST['machine'])){
-            $atmtype .= " AND atm_type='".$_POST['machine']."' ";
+         if(isset($_REQUEST['machine']) && !empty($_REQUEST['machine'])){
+            $atmtype .= " AND atm_type='".$_REQUEST['machine']."' ";
          }
          
         
         
-        $filterResult .=" WHERE id !='' ". $prodname.$clientname.$areaname.$regionname.$atmtype ;
+        $filterResult .=" WHERE id !='' ". $prodname.$clientname.$areaname.$regionname.$atmtype.$clientid ;
+
+        print_r($filterResult);
         
         
         
@@ -78,7 +87,6 @@ class Clientproduct_Model extends Model{
 		return $index_array;
 
 	}
-    
 
     public function getData(){
 		global $database;
@@ -98,16 +106,12 @@ class Clientproduct_Model extends Model{
         return Worksheet::find_by_productid($id);
         
     }
-    
- 
-    
+
 	public function getById($id){
 		return Cproduct::find_by_id($id);
        // $myaccount = Accounts::find_by_phone($phone);
        
 	}
-
-
 	/**
      * this  get an auto complete 
      * method on client for the purchase
@@ -116,7 +120,6 @@ class Clientproduct_Model extends Model{
     public function clientID_AutoComplete($id=""){
         return (Client::find_by_sql("SELECT * FROM tbl_client WHERE name LIKE '%".$_POST['input']."%'"));
     }
-    
     /**
      * this section is used to get auto complete
      * feature for the product 
@@ -125,13 +128,10 @@ class Clientproduct_Model extends Model{
     public function prodID_AutoComplete($id=""){
         return (Product::find_by_sql("SELECT * FROM product2 WHERE prod_name LIKE '%".$_POST['input']."%'"));
     }
-    
-    
+
     public function cprodID_AutoComplete($id=""){
         return (Cproduct::find_by_sql("SELECT * FROM client_product WHERE client_id='".$_POST['clientid']."' AND ( prod_name LIKE '%".$_POST['input']."%' OR install_city LIKE '%".$_POST['input']."%' OR install_address LIKE '%".$_POST['input']."%' )"));
     }
-    
-    
      /**
      * use with jquery to porpulate the region  
      * listitem in  form 
@@ -142,7 +142,6 @@ class Clientproduct_Model extends Model{
         }
     }
 
-	
 	public function create(){
 		if(!empty($_POST['clientid']) && !empty($_POST['prodname'])  &&  !empty($_POST["address"]) && !empty($_POST["country"]) && !empty($_POST["state"]) ){
 			
@@ -199,6 +198,7 @@ class Clientproduct_Model extends Model{
 				$newProduct->client_id 					=	$_POST["clientid"];
 				$newProduct->client_name				=	$_POST["clientname"];
                 $newProduct->prod_id                    =   $_POST["prodid"];
+                $newProduct->terminal_id                =   $_POST['terminal_id'];
 				$newProduct->prod_name					=	$_POST["prodname"];//." ". $_POST["clientname"]." ".$_POST["sregion"]." ".$_POST['site'];
 				$newProduct->prod_serial				=	$_POST["serial"];
 				$newProduct->install_address			=	$_POST["address"];
@@ -251,9 +251,7 @@ class Clientproduct_Model extends Model{
 		  return 3; //returns 3 if requiered input field is not supplied
 		}
 	}
-    
-    
-    
+
     public function update(){
 		if(!empty($_POST['clientid']) && !empty($_POST['prodname'])  &&  !empty($_POST["address"]) && !empty($_POST["country"]) && !empty($_POST["state"]) && !empty($_POST["pgid"])
         ){	
@@ -309,6 +307,7 @@ class Clientproduct_Model extends Model{
 				$thisclientproduct->client_id 					=	$_POST["clientid"];
 				$thisclientproduct->client_name				    =	$_POST["clientname"];
                 $thisclientproduct->prod_id                     =   $_POST["prodid"];
+                $thisclientproduct->terminal_id                 =   $_POST['terminal_id'];
 				$thisclientproduct->prod_name					=	$_POST["prodname"];
 				$thisclientproduct->prod_serial				    =	$_POST["serial"];
 				$thisclientproduct->install_address			    =	$_POST["address"];
@@ -350,8 +349,11 @@ class Clientproduct_Model extends Model{
     public function updateSchedule(){
         if(!empty($_POST['sdate']) && !empty($_POST['cid'])){
             $thisclientproduct  =   Cproduct::find_by_id((int)preg_replace('#[^0-9]#i','',$_POST['cid']));
+            $thisSchedule       =   new Schedule();
             $postable = $_POST['sdate'];
-            $thisclientproduct->last_maint_date     =   $postable;
+
+
+            /*$thisclientproduct->last_maint_date     =   $postable;
             $weekendSatInterval="";
             $date = new DateTime($postable);
             $interval = new DateInterval('P3M');
@@ -363,28 +365,45 @@ class Clientproduct_Model extends Model{
             }elseif(date('l', strtotime($date))=="Sunday"){
                 $weekendSunInterval = new DateInterval("P1D");
                 $date->add($weekendSatInterval);
-            }
-            
-            $thisclientproduct->next_maint_date     =  $date->format("Y-m-d H:i:s");
+            }*/
+            $thisclientproduct->next_maint_date     = $postable;// $date->format("Y-m-d H:i:s");
             $msg="<strong>Dear Customer</strong> <br />
             <p>Please be informed that your machine with details below";
             
             $msg    .= "<table  width='100%'>
-            <thead><tr><th>Serial No</th><th>Product </th><th>Location</th><th>Area/Region </th><th></th></tr>
+            <thead><tr><th>Terminal ID</th><th>Product </th><th>Location</th><th>Area/Region </th><th></th></tr>
             </thead>
-            <tbody><tr><td>".$thisclientproduct->prod_serial."</td><td>".$thisclientproduct->prod_name."</td><td>".$thisclientproduct->install_address." </td><td>".$thisclientproduct->install_area." ".$thisclientproduct->install_city."</td><td></td></tr></tbody>
+            <tbody><tr><td>".$thisclientproduct->terminal_id."</td><td>".$thisclientproduct->prod_name."</td><td>".$thisclientproduct->install_address." </td><td>".$thisclientproduct->install_area." ".$thisclientproduct->install_city."</td><td></td></tr></tbody>
             </table>";
             
-            $msg.=" will be due for maintenance on the". $date->format("Y-m-d H:i:s").
+            $msg.=" will be due for maintenance on the". $_POST['sdate'].
             " This is to notify you ahead of time</p> <br /> <strong>Thanks</strong>";
             if($thisclientproduct->update()){
-                $cemail =   array("iarowolo@roberjohnsonholdings.com","iarowolo@gmail.com");
-                //$cemail =   $thisclientproduct->
-                $client  = $this->getClientByID($thisclientproduct->client_id);
+
+                $cemail     =   array("rjsupport@roberjohnsonsupport.com","iarowolo@robertjohnsonsupport.com");
+                //$cemail   =   $thisclientproduct->
+                $client     = $this->getClientByID($thisclientproduct->client_id);
+
+              // $empArr                      = explode(";",$_POST['empfield']);
+                $thisSchedule->client_id        = $thisclientproduct->client_id;
+                $thisSchedule->terminal_id      = $thisclientproduct->terminal_id;
+                $thisSchedule->ticket_id        = str_pad(mt_rand(8,1000000), 10, "0", STR_PAD_LEFT).time();
+                $thisSchedule->prod_id          = $thisclientproduct->id;
+                $employee                       = Employee::find_by_staff_id($_POST['emp']);
+                $thisSchedule->emp_id           = $employee->id;
+                $thisSchedule->s_date           = !empty($_POST['sdate']) ? ($_POST['sdate']) : date("Y-m-d H:i:s") ;
+                $thisSchedule->emp_name         = $employee->emp_lname." ". $employee->emp_fname;
+                $thisSchedule->datecreated      =   date("Y-m-d H:i:s");
+                $thisSchedule->status           = "Open";
+                $thisSchedule->maint_type       = "Activation";
+
+                $thisSchedule->create();
+
+
                 array_push($cemail,$client->contact_email);
                 array_push($cemail,$client->email);
                 
-                $this->sendMail("Robert Johnson Holdings Ltd","Next Quarterly Maintenance Schedule",$msg,$cemail);
+                $this->sendMail("Robert Johnson Holdings Ltd","Next Maintenance Schedule",$msg,$cemail);
                 return true;
             }else{
                 return false;
@@ -393,19 +412,40 @@ class Clientproduct_Model extends Model{
     }
     
     public function createSchedule($id=""){
-       
-        if(!empty($_POST['taskdate']) && !empty($_POST['cid']) && !empty($_POST['empid'])){
-            $thisclientproduct                      =   Cproduct::find_by_id((int)preg_replace('#[^0-9]#i','',$_POST['cid']));
-            $thisemployee                           =   Employee::find_by_id((int)preg_replace('#[^0-9]#i','',$_POST['empid']));
-            $thisSchedule                           =   new Schedule();
-            $clientTicket                           =   Ticket::find_by_id($id);
-       
-            $thisSchedule->emp_id                   =   $_POST['empid'];
-        	$thisSchedule->emp_name                 =   $thisemployee->emp_fname." ". $thisemployee->emp_lname;
-        	$thisSchedule->client_id                =   $thisclientproduct->client_id;
-            $thisClient                             =   Client::find_by_id($thisclientproduct->client_id);
-            $thisSchedule->prod_id                  =      $_POST['cid'];
-            $thisSchedule->prod_name                =   $thisclientproduct->prod_name;
+        if(!empty($_POST['cid']) && !empty($_POST['empid']) ){
+            $thisclientproduct          =   Cproduct::find_by_id((int)preg_replace('#[^0-9]#i','',$_POST['cid']));
+            $empdata                    = explode("_",$_POST['empid']);
+            $thisemployee               =   Employee::find_by_staff_id($empdata[0]);
+            //print_r($thisemployee);
+            $thisSchedule               =   new Schedule();
+            $clientTicket               =   Ticket::find_by_id((int)preg_replace('#[^0-9]#i','',$id));
+            $thisclientproduct          =   Cproduct::find_by_id((int)preg_replace('#[^0-9]#i','',$clientTicket->prod_id));
+            if($_POST['mtype'] !="Activation" && (($_POST['Corrective'] ||$_POST['Preventive'] ) )){
+
+                $clientTicket->status         =   "Admin Reply";
+                $clientTicket->datemodified   =   date("Y-m-d H:i:s");
+                $thisSchedule->status         =   "In Progress";
+           }else{
+                $clientTicket  = Activation::find_by_id((int)preg_replace('#[^0-9]#i','',$id));
+                if($clientTicket){
+
+                    $thisclientproduct          =   Cproduct::find_by_id((int)preg_replace('#[^0-9]#i','',$clientTicket->prod_id));
+                    $clientTicket->status         =   "In Progress";
+                    $clientTicket->updated_at   =   date("Y-m-d H:i:s");
+                }
+
+
+            }
+            $thisSchedule->status         =   "In Progress";
+            $thisSchedule->emp_id         =  $thisemployee->id;
+        	$thisSchedule->emp_name       =   $thisemployee->emp_fname." ". $thisemployee->emp_lname;
+        	$thisSchedule->client_id      =   $thisclientproduct->client_id;
+            $thisClient                   =   Client::find_by_id($thisclientproduct->client_id);
+            $thisSchedule->prod_id        =   $thisclientproduct->id;
+
+            $thisSchedule->ticket_id      =   $id;
+            $thisSchedule->prod_name      =   $thisclientproduct->prod_name;
+           // exit;
             /**
              * this is to check if ticket
              * is in existence
@@ -414,39 +454,50 @@ class Clientproduct_Model extends Model{
              global $session;
             //$partTicket                             =   ($id!="") ? Ticket::find_by_id($id) : ""; // get the ticket to get details needed for sending mail
             $theUser                                =   Employee::find_by_id($_SESSION["emp_ident"])  ; // get cse detail to retrieve email
-            
-        	$thisSchedule->s_date                   =   $_POST['taskdate'];
+
+        	$thisSchedule->s_date                   =   !empty($_POST['taskdate']) ? $_POST['taskdate'] : date("Y-m-d");
             $cemail                                 = array();
 
             
             $cemail                     =       (!empty($_POST['cemail']) && isset($_POST['cemail'])) ? explode(",",$_POST['cemail']) : array('iarowolo@gmail.com');
             
-            array_push($cemail,$thisemployee->emp_email,(is_array($partTicket)) ? $partTicket->contact_email : "",$theUser->emp_email,$thisClient->email);
+            array_push($cemail,$thisemployee->emp_email,(is_array($clientTicket)) ? $clientTicket->contact_email : "",$theUser->emp_email,$thisClient->email);
            array_push($cemail,$clientTicket->contact);
             array_push($cemail,$thisClient->contact_email);
             array_push($cemail,$thisClient->email);
+
             //print_r($cemail);
-            $thisSchedule->status                   = "Open";
+
             $thisSchedule->issue                    =   $_POST["tissue"];
-        	$thisSchedule->datecreated              = date("Y-m-d H:i:s");
-            $thisSchedule->maint_type               = $_POST['mtype'];
+        	$thisSchedule->datecreated              =   date("Y-m-d H:i:s");
+            $thisSchedule->maint_type               =   $_POST['mtype'];
             $subject                                =   "Maintenance Alert";
-            $smsmsg                                 =   "Maintenance alert for $thisclientproduct->prod_name at";
+            $smsmsg                                 =   "Maintenance alert for". $thisclientproduct->terminal_id ." ". $thisclientproduct->prod_name ."at";
             $smsmsg                                 .=  $thisclientproduct->install_location .",". $thisclientproduct->branch;
-            $smsmsg                                 .="\r\n issue:". $_POST["tissue"]."\r\n";
-            $msg                                    ="<h3>Maintenance Detail</h3> <hr />";
-            $msg                                    .="<p><strong>Machine: </strong>$thisclientproduct->prod_name </p>";
-            $msg                                    .="<p><strong>Client: </strong> $thisClient->name</p>";
-            $msg                                    .="<p><strong>Location: </strong>$thisclientproduct->install_location $thisclientproduct->branch $thisclientproduct->install_city </p>";
-            $msg                                    .="<p><strong>Complaint: </strong>".(!empty($_POST['tissue']) ? $_POST['tissue'] : $partTicket->issue)."</p>";
-            $msg                                    .="<br /><br /> <h4>Technician Details</h4> <hr />";
-            $msg                                    .="<p><strong>Name: </strong>".$thisemployee->emp_fname." ".$thisemployee->emp_lname."</p>";
-            $msg                                    .="<p><strong>Email: </strong>".$thisemployee->emp_email."</p>";
-            $msg                                    .="<p><strong>Telephone: </strong>".$thisemployee->emp_phone."</p>";
+            $smsmsg                                 .=  "\r\n issue:". $_POST["tissue"]."\r\n";
+            $msg                                    =   "<h3>Maintenance Detail</h3> <hr />";
+            $msg                                    .=  "<p><strong>Terminal ID: </strong>$thisclientproduct->terminal_id </p>";
+            $msg                                    .=  "<p><strong>Machine: </strong>$thisclientproduct->prod_name </p>";
+            $msg                                    .=  "<p><strong>Client: </strong> $thisClient->name</p>";
+            $msg                                    .=  "<p><strong>Location: </strong>$thisclientproduct->install_location $thisclientproduct->branch $thisclientproduct->install_city </p>";
+            $msg                                    .=  "<p><strong>Complaint: </strong>".(!empty($_POST['tissue']) ? $_POST['tissue'] : $clientTicket->issue)."</p>";
+            $msg                                    .=  "<br /><br /> <h4>Technician Details</h4> <hr />";
+            $msg                                    .=  "<p><strong>Name: </strong>".$thisemployee->emp_fname." ".$thisemployee->emp_lname."</p>";
+            $msg                                    .=  "<p><strong>Email: </strong>".$thisemployee->emp_email."</p>";
+            $msg                                    .=  "<p><strong>Telephone: </strong>".$thisemployee->emp_phone."</p>";
             $msg                                    .="<br /><br /><h4>Scheduled Date</h4> <hr />";
             $msg                                    .="<p><strong>$thisSchedule->s_date</strong></p><br /><br /><br /><br />";
 
+            $newReply                   =   new Ticketreply();
+            $newReply->sender_id        =   $_SESSION["emp_ident"];
+            $newReply->ticket_id        =   $id;
 
+            $newReply->sender_name      =   $theUser->emp_fname." ".$theUser->emp_lname;
+            $newReply->sender_type      =   "Admin";
+            $newReply->message          =   $msg;
+            $newReply->datecreated      =   date("Y-m-d H:i:s");
+            $newReply->datemodified    = date("Y-m-d H:i:s");
+            //$newReply->create();
             
             /**
              * the transaction log is created
@@ -459,27 +510,28 @@ class Clientproduct_Model extends Model{
             $Tlog2->trans_type          =   "TASK ASSIGNMENT";
             $Tlog2->trans_description   =   "Corrective Maintenance task assigned to ".$thisemployee->emp_fname ." ".$thisemployee->emp_lname."";
             $Tlog2->datecreated         =   date("Y-m-d H:i:s");
+            $Tlog2->datemodified        =   date("Y-m-d H:i:s");
             $Tlog2->user_id             =   $_SESSION['emp_ident'];
 
             // print_r($msg);           
-            if($thisSchedule->create()){
+            if($newReply->create()){
+                $thisSchedule->create();
+                $clientTicket->datemodified = date("Y-m-d H:i:s");
+                $clientTicket->update();
+
                 $Tlog2->create();
                 //$thisemployee->emp_phone                
                 sendSms($thisemployee->emp_phone, $smsmsg);
                 sendSms($thisClient->contact_phone,$smsmsg);
                 sendSms($thisClient->phone,$smsmsg);
                 $this->sendMail($thisSchedule->emp_name,$subject,$msg,$cemail);
-                return 1;
+                return true;
             }else{
-                return 2;
+                return false;
             }   
         } 
     }
-    
-    
-    
-    
-    
+
     public function createSchedule_Detail($id=""){
        header('Content-Type: application/json');
        
@@ -487,9 +539,6 @@ class Clientproduct_Model extends Model{
        foreach($data as $d=>$value){
             $cntdata[]=$d;
        }
-       
-       
-
         if(!empty($data->taskdate) && !empty($data->cid) && !empty($data->empid)){
             $issuefield      =   get_object_vars($data); // get the properties of an object into an array
             $thisclientproduct                      =   Cproduct::find_by_id((int)preg_replace('#[^0-9]#i','',$data->cid));
@@ -614,9 +663,7 @@ class Clientproduct_Model extends Model{
 	  $object_vars = $this->attributes();
 	  return array_key_exists($attribute, $object_vars);
 	}
-    
-    
-    
+
     public function createsignoff(){
 		if(isset($_POST['prod_id']) && !empty($_POST['prod_id'])){
 			$error = array();
@@ -649,8 +696,7 @@ class Clientproduct_Model extends Model{
             $obj->datecreated               =   date("Y-m-d H:i:s");
 		}
 	}
-    
-    
+
     public function updatesignoff(){
 		if(isset($_POST['prod_id']) && !empty($_POST['prod_id'])){
 			$error = array();
@@ -682,9 +728,8 @@ class Clientproduct_Model extends Model{
 			$obj->scan_url;
 		}
 	}
-    
-    
-     public function sendMail($name,$subject,$msg,$copy){
+
+    public function sendMail($name,$subject,$msg,$copy){
 		//$mail                                     = new Mail(); 
         $copy       =   implode(",",$copy);
        

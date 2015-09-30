@@ -1,4 +1,8 @@
+<meta http-equiv="refresh" content="25" />
 
+<?php
+//require_once("includes/head.php");
+?>
 <div class="panel callout">
 	<h4 style="display:inline">Dashboard</h4>
 </div>
@@ -20,3 +24,9 @@
     }
     ?>
 </div>
+<script type="text/javascript">
+    jQuery(document).ready(function($) {
+        setInterval(window.location.reload(),50000)
+    })
+
+</script>

@@ -35,34 +35,40 @@
 		 * of all the filter fields if only one field is set
 		 */
          $filterResult ="";
-         if(isset($_POST['status']) && !empty($_POST['status'])){
-            $statusfield .= " AND status = '".$_POST['status']."' ";
+         if(isset($_REQUEST['status']) && !empty($_REQUEST['status'])){
+             if(strtolower(($_REQUEST['status'])) == "pending"){
+                 $statusfield .= " AND status = 'Admin Reply' OR status ='Customer Reply'";
+             }else{
+                 $statusfield .= " AND status = '".$_REQUEST['status']."' ";
+             }
+
          }
-         if(isset($_POST['clientid']) && !empty($_POST['clientid'])){
-            $clientidfield .= " AND client_id='".$_POST['clientid']."' ";
-         }
-         
-         if(isset($_POST['prodid']) && !empty($_POST['prodid'])){
-            $prodnamefield .= " AND prod_id = '".$_POST['prodid']."' ";
-         }
-         
-         if(isset($_POST['location']) && !empty($_POST['location'])){
-            $locationfield .= " AND location LIKE '%".$_POST['location']."%' ";
+
+         if(isset($_REQUEST['clientid']) && !empty($_REQUEST['clientid'])){
+            $clientidfield .= " AND client_id='".$_REQUEST['clientid']."' ";
          }
          
-         if(isset($_POST['issue']) && !empty($_POST['issue'])){
-            $issuefield .= " AND issue LIKE '%".$_POST['issue']."%' ";
+         if(isset($_REQUEST['prodid']) && !empty($_REQUEST['prodid'])){
+            $prodnamefield .= " AND prod_id = '".$_REQUEST['prodid']."' ";
+         }
+         
+         if(isset($_REQUEST['location']) && !empty($_REQUEST['location'])){
+            $locationfield .= " AND location LIKE '%".$_REQUEST['location']."%' ";
+         }
+         
+         if(isset($_REQUEST['issue']) && !empty($_REQUEST['issue'])){
+            $issuefield .= " AND issue LIKE '%".$_REQUEST['issue']."%' ";
          }
          
          
-         if(!empty($_POST['fdate']) && !empty($_POST['tdate'])){
-            $datefield .= " AND datecreated BETWEEN  '".$_POST['fdate']."' AND '".$_POST['tdate']."' ";
+         if(!empty($_REQUEST['fdate']) && !empty($_REQUEST['tdate'])){
+            $datefield .= " AND datecreated BETWEEN  '".$_REQUEST['fdate']."' AND '".$_REQUEST['tdate']."' ";
          }
-          if(empty($_POST['fdate']) && !empty($_POST['tdate'])){
-            $datefield .= " AND datecreated < '".$_POST['tdate']."' ";
+          if(empty($_REQUEST['fdate']) && !empty($_REQUEST['tdate'])){
+            $datefield .= " AND datecreated < '".$_REQUEST['tdate']."' ";
          }
-          if(!empty($_POST['fdate']) && empty($_POST['tdate'])){
-            $datefield .= " AND datecreated >  '".$_POST['fdate']."'  ";
+          if(!empty($_REQUEST['fdate']) && empty($_REQUEST['tdate'])){
+            $datefield .= " AND datecreated >  '".$_REQUEST['fdate']."'  ";
          }
         
         $filterResult .= " WHERE id !=''".$statusfield.$clientidfield.$prodnamefield.$locationfield.$issuefield.$datefield ;
@@ -133,9 +139,11 @@
          * issues may arise that when database
          * is cleared emp_dept may not be 5
          */
+        $clients = Client::find_all();
+       // print_r($clients);
         $techEmployee   = Employee::find_by_sql("SELECT * FROM employee WHERE emp_dept = 5");
 		$zone 			= Zone::find_by_sql("SELECT * FROM zone");
-		$startups 		= array("departs"=>$depts,"country"=>$country,"zone"=>$zone,"vendors"=>$vendors,"role"=>$role,"myproducts"=>$myproducts,"techstaff"=>$techEmployee,"lastsf"=>$lastSignoff,"lastws"=>$lastWorkSheet);
+		$startups 		= array("clients"=>$clients,"departs"=>$depts,"country"=>$country,"zone"=>$zone,"vendors"=>$vendors,"role"=>$role,"myproducts"=>$myproducts,"techstaff"=>$techEmployee,"lastsf"=>$lastSignoff,"lastws"=>$lastWorkSheet);
 		return $startups;		
 	}
     
@@ -165,9 +173,12 @@
         $open_worksheet_count         =   ($database->dbNumRows($database->db_query("SELECT * FROM work_sheet_form WHERE status ='Open' ORDER BY id DESC ")));
 		$awaiting_ticket_count = ($database->dbNumRows($database->db_query("SELECT * FROM support_ticket WHERE status ='Customer Reply' ")));
         $closed_worksheet_count = ($database->dbNumRows($database->db_query("SELECT * FROM work_sheet_form WHERE status ='Closed' ")));
-        $client_count           =($database->dbNumRows($database->db_query("SELECT * FROM tbl_client")));  
-        $client_products           =($database->dbNumRows($database->db_query("SELECT * FROM client_product"))); 
-		$darray = array("cproducts"=>$client_products,"clients"=>$client_count,"oworksheet"=>$open_worksheet_count,"oschedule"=>$open_schedule_count,"otcount"=>$open_ticket_count,"atcount"=>$awaiting_ticket_count);
+        $client_count           =($database->dbNumRows($database->db_query("SELECT * FROM tbl_client")));
+         $openPendings          =Ticket::find_by_sql("SELECT * FROM support_ticket WHERE   status ='Open' ");
+         print_r($openPendings);
+        $client_products           =($database->dbNumRows($database->db_query("SELECT * FROM client_product")));
+         $clients = Client::find_all();
+		$darray = array("openPendings"=>$openPendings,"cproducts"=>$client_products,"clients"=>$clients,"oworksheet"=>$open_worksheet_count,"oschedule"=>$open_schedule_count,"otcount"=>$open_ticket_count,"atcount"=>$awaiting_ticket_count);
 		return $darray;
      }
     
@@ -177,7 +188,7 @@
      */
     public function createAdminReply($id){
         
-        if(isset($_POST["issues"]) && isset($_POST["conname"])){
+        if(isset($_REQUEST["issues"]) && isset($_REQUEST["conname"])){
             $newReply = new Ticketreply();
             $newReply->sender_id        =       $_SESSION["emp_ident"];
             $newReply->ticket_id        =       $id;
@@ -185,9 +196,9 @@
             $cemail                     =       array();
             $newReply->sender_name      =       $theUser->emp_fname." ".$theUser->emp_lname;
             $newReply->sender_type      =       "Admin";
-            $newReply->message          =       $_POST['issues'];
+            $newReply->message          =       $_REQUEST['issues'];
             $newReply->datecreated      =       date("Y-m-d H:i:s");
-            $cemail                     =       (!empty($_POST['cemail'])) ? explode(",",$_POST['cemail']) : "";
+            $cemail                     =       (!empty($_REQUEST['cemail'])) ? explode(",",$_REQUEST['cemail']) : "";
             
             $partTicket                 =       Ticket::find_by_id($id);
            // print_r($partTicket);
@@ -224,8 +235,7 @@
         }
     }
     
-   
-    
+
     
     
     /**
@@ -314,7 +324,7 @@
         
         $statusfield ="";
         $clientidfield ="";
-        $issuefiel ="";
+        $issuefield ="";
        // $productidfield ="";
         $datefield  ="";
         
@@ -323,31 +333,30 @@
 		 * of all the filter fields if only one field is set
 		 */
          $filterResult ="";
-         if(isset($_POST['status']) && !empty($_POST['status'])){
-            $statusfield .= " AND status = '".$_POST['status']."' ";
+         if(isset($_REQUEST['status']) && !empty($_REQUEST['status'])){
+            $statusfield .= " AND status = '".$_REQUEST['status']."' ";
          }
-         if(isset($_POST['clientid']) && !empty($_POST['clientid'])){
-            $clientidfield .= " AND client_id=".$_POST['clientid'];
+         if(isset($_REQUEST['clientid']) && !empty($_REQUEST['clientid'])){
+            $clientidfield .= " AND client_id=".$_REQUEST['clientid'];
          }
-                
-         if(isset($_POST['issue']) && !empty($_POST['issue'])){
-            $issuefield .= " AND problem LIKE '%".$_POST['issue']."%' ";
+         if(isset($_REQUEST['issue']) && !empty($_REQUEST['issue'])){
+            $issuefield .= " AND problem LIKE '%".$_REQUEST['issue']."%' ";
          }
          
-         //if(isset($_POST['prodid']) && !empty($_POST['prodid'])){
-          //  $productidfield .= " AND prod_id = '".$_POST['prodid']."' ";
+         //if(isset($_REQUEST['prodid']) && !empty($_REQUEST['prodid'])){
+          //  $productidfield .= " AND prod_id = '".$_REQUEST['prodid']."' ";
          //}
          
          
          
-         /*if(!empty($_POST['fdate']) && !empty($_POST['tdate'])){
-            $datefield .= " AND datecreated BETWEEN  '".$_POST['fdate']."' AND '".$_POST['tdate']."' ";
+         /*if(!empty($_REQUEST['fdate']) && !empty($_REQUEST['tdate'])){
+            $datefield .= " AND datecreated BETWEEN  '".$_REQUEST['fdate']."' AND '".$_REQUEST['tdate']."' ";
          }
-          if(empty($_POST['fdate']) && !empty($_POST['tdate'])){
-            $datefield .= " AND datecreated < '".$_POST['tdate']."' ";
+          if(empty($_REQUEST['fdate']) && !empty($_REQUEST['tdate'])){
+            $datefield .= " AND datecreated < '".$_REQUEST['tdate']."' ";
          }
-          if(!empty($_POST['fdate']) && empty($_POST['tdate'])){
-            $datefield .= " AND datecreated >  '".$_POST['fdate']."'  ";
+          if(!empty($_REQUEST['fdate']) && empty($_REQUEST['tdate'])){
+            $datefield .= " AND datecreated >  '".$_REQUEST['fdate']."'  ";
          }*/
         
         $filterResult .= " WHERE id !=''".$clientidfield.$issuefield.$statusfield ;
@@ -395,31 +404,31 @@
 		 * of all the filter fields if only one field is set
 		 */
          $filterResult ="";
-         if(isset($_POST['status']) && !empty($_POST['status'])){
-            $statusfield .= " AND status = '".$_POST['status']."' ";
+         if(isset($_REQUEST['status']) && !empty($_REQUEST['status'])){
+            $statusfield .= " AND status = '".$_REQUEST['status']."' ";
          }
-         if(isset($_POST['clientid']) && !empty($_POST['clientid'])){
-            $clientidfield .= " AND client_id='".$_POST['clientid']."' ";
+         if(isset($_REQUEST['clientid']) && !empty($_REQUEST['clientid'])){
+            $clientidfield .= " AND client_id='".$_REQUEST['clientid']."' ";
          }
          
-         if(isset($_POST['prodid']) && !empty($_POST['prodid'])){
-            $prodnamefield .= " AND prod_id = '".$_POST['prodid']."' ";
+         if(isset($_REQUEST['prodid']) && !empty($_REQUEST['prodid'])){
+            $prodnamefield .= " AND prod_id = '".$_REQUEST['prodid']."' ";
          }
          
                  
-         if(isset($_POST['issue']) && !empty($_POST['issue'])){
-            $issuefield .= " AND issue LIKE '%".$_POST['issue']."%' ";
+         if(isset($_REQUEST['issue']) && !empty($_REQUEST['issue'])){
+            $issuefield .= " AND issue LIKE '%".$_REQUEST['issue']."%' ";
          }
          
          
-         if(!empty($_POST['fdate']) && !empty($_POST['tdate'])){
-            $datefield .= " AND datecreated BETWEEN  '".$_POST['fdate']."' AND '".$_POST['tdate']."' ";
+         if(!empty($_REQUEST['fdate']) && !empty($_REQUEST['tdate'])){
+            $datefield .= " AND datecreated BETWEEN  '".$_REQUEST['fdate']."' AND '".$_REQUEST['tdate']."' ";
          }
-          if(empty($_POST['fdate']) && !empty($_POST['tdate'])){
-            $datefield .= " AND datecreated < '".$_POST['tdate']."' ";
+          if(empty($_REQUEST['fdate']) && !empty($_REQUEST['tdate'])){
+            $datefield .= " AND datecreated < '".$_REQUEST['tdate']."' ";
          }
-          if(!empty($_POST['fdate']) && empty($_POST['tdate'])){
-            $datefield .= " AND datecreated >  '".$_POST['fdate']."'  ";
+          if(!empty($_REQUEST['fdate']) && empty($_REQUEST['tdate'])){
+            $datefield .= " AND datecreated >  '".$_REQUEST['fdate']."'  ";
          }
         
         $filterResult .= " WHERE id !=''".$statusfield.$clientidfield.$prodnamefield.$issuefield.$datefield ;
@@ -454,7 +463,7 @@
  */
     
     public function  creatworksheet(){
-        if( !empty($_POST['wsid']) && !empty($_POST['prod_id'])  ){
+        if( !empty($_REQUEST['wsid']) && !empty($_REQUEST['prod_id'])  ){
             $newWorkSheet = new Worksheet();
 			if(isset($_FILES['fupload']) && $_FILES['fupload']['error']==0){ //if file upload is set
 					move_uploaded_file($_FILES['fupload']['tmp_name'],"public/uploads/".basename($_FILES['fupload']['name']));
@@ -489,48 +498,48 @@
 					$newWorkSheet->scan_url = $photo;
 					  
 				}else{
-					//$applicant->img_url = $_POST['imgvalue'];
+					//$applicant->img_url = $_REQUEST['imgvalue'];
 				}
                 
-                if(!isset($_POST['staff_id'])){
-                $mySchedule         =   Schedule::find_by_id($_POST['wsid']);
+                if(!isset($_REQUEST['staff_id'])){
+                $mySchedule         =   Schedule::find_by_id($_REQUEST['wsid']);
     			
                     $newWorkSheet->prod_id              =   $mySchedule->prod_id;
                     $newWorkSheet->client_id            =   $mySchedule->client_id;
                     $newWorkSheet->prod_name            =   $mySchedule->prod_name;
-                    $newWorkSheet->cse_emp_id           =   empty($_POST["emp_id"]) ? $mySchedule->emp_id : $_POST['emp_id'];
-                	$newWorkSheet->problem              =   empty($_POST["problem"]) ? $mySchedule->issue : $_POST['problem'] ;
+                    $newWorkSheet->cse_emp_id           =   empty($_REQUEST["emp_id"]) ? $mySchedule->emp_id : $_REQUEST['emp_id'];
+                	$newWorkSheet->problem              =   empty($_REQUEST["problem"]) ? $mySchedule->issue : $_REQUEST['problem'] ;
                 }else{ //if schedule does not exist for work sheet
                 //following data can be porpulated like this
                 //ie when the direct work sheet form is used
-                    $newWorkSheet->prod_id              =   $_POST['prod_id'];
-                    $newWorkSheet->client_id            =   $_POST['clientid'];
-                    $newWorkSheet->prod_name            =   $_POST['cprodname'];
-                    $empInfo                            =   explode("_ ",$_POST['staff_id']);
-                    $newWorkSheet->cse_emp_id           =   $empInfo[0];//empty($_POST["emp_id"]) ? $mySchedule->emp_id : $_POST['emp_id'];
+                    $newWorkSheet->prod_id              =   $_REQUEST['prod_id'];
+                    $newWorkSheet->client_id            =   $_REQUEST['clientid'];
+                    $newWorkSheet->prod_name            =   $_REQUEST['cprodname'];
+                    $empInfo                            =   explode("_ ",$_REQUEST['staff_id']);
+                    $newWorkSheet->cse_emp_id           =   $empInfo[0];//empty($_REQUEST["emp_id"]) ? $mySchedule->emp_id : $_REQUEST['emp_id'];
                     $newWorkSheet->cse_emp_name         =   $empInfo[1];
-                	$newWorkSheet->problem              =   empty($_POST["problem"]) ;
-                    $newWorkSheet->status               =   $_POST['wstatus'];
+                	$newWorkSheet->problem              =   empty($_REQUEST["problem"]) ;
+                    $newWorkSheet->status               =   $_REQUEST['wstatus'];
                 }
-                $newWorkSheet->formid               =   $_POST['wsid'];
-                $newWorkSheet->sheet_date           =   $_POST["w_date"];
-            	$newWorkSheet->time_in              =   $_POST["time_in"];
-            	$newWorkSheet->time_out             =   $_POST["time_out"];
-            	$newWorkSheet->contact_person       =   $_POST["contact_person"];
-            	$newWorkSheet->cause                =   $_POST["cause"];
-                $newWorkSheet->corrective_action    =   $_POST["corrective_action"];
-            	$newWorkSheet->part_changed         =   $_POST["part_changed"];
-            	$newWorkSheet->cse_remark           =   $_POST["cse_remark"];
-            	$newWorkSheet->client_remark        =   $_POST["client_remark"];
+                $newWorkSheet->formid               =   $_REQUEST['wsid'];
+                $newWorkSheet->sheet_date           =   $_REQUEST["w_date"];
+            	$newWorkSheet->time_in              =   $_REQUEST["time_in"];
+            	$newWorkSheet->time_out             =   $_REQUEST["time_out"];
+            	$newWorkSheet->contact_person       =   $_REQUEST["contact_person"];
+            	$newWorkSheet->cause                =   $_REQUEST["cause"];
+                $newWorkSheet->corrective_action    =   $_REQUEST["corrective_action"];
+            	$newWorkSheet->part_changed         =   $_REQUEST["part_changed"];
+            	$newWorkSheet->cse_remark           =   $_REQUEST["cse_remark"];
+            	$newWorkSheet->client_remark        =   $_REQUEST["client_remark"];
                 $newWorkSheet->datecreated          =   date("Y-m-d H:i:s");
               global $session;  
               
                  
               			
 			if($newWorkSheet->create()){
-			 if(!isset($_POST['staff_id'])){
+			 if(!isset($_REQUEST['staff_id'])){
 			     $mySchedule->status =   "Closed";
-                 $mySchedule->datemodified  =   date("Y:m:d H:i:s");
+                 $mySchedule->datemodified  =   date("Y-m-d H:i:s");
     			 $mySchedule->update();
 			     $Tlog   =   new Transaction();
                  $Tlog->com_id              =   $mySchedule->main_id;
@@ -540,7 +549,7 @@
                  $Tlog->user_id             =   $_SESSION['emp_ident'];
 			     $Tlog->create();
                 }
-			// $schedulee      =   Schedule::find_by_id($_POST["wsid"]);
+			// $schedulee      =   Schedule::find_by_id($_REQUEST["wsid"]);
              
              
 			 $_SESSION["message"]="<div data-alert class='alert-box success'>Record Saved <a href='#' class='close'>&times;</a></div>";
@@ -557,13 +566,10 @@
 		}
         
     }
-    
-    
-    
-   
+
   
    	public function createsignoff(){
-		if(isset($_POST['prod_id']) && !empty($_POST['prod_id']) && !empty($_POST['staff_id']) && !empty($_POST['wsid']) && !empty($_POST['clientid'])){
+		if(isset($_REQUEST['prod_id']) && !empty($_REQUEST['prod_id']) && !empty($_REQUEST['staff_id']) && !empty($_REQUEST['wsid']) && !empty($_REQUEST['clientid'])){
 			$error = array();
             $obj = new Sign_off();
             if(isset($_FILES['fupload']) && $_FILES['fupload']['error']==0){ //if file upload is set
@@ -599,42 +605,42 @@
 					$obj->scan_url = $photo;
 					  
 				}else{
-					//$applicant->img_url = $_POST['imgvalue'];
+					//$applicant->img_url = $_REQUEST['imgvalue'];
 				}
                 
                 
                 
                
-                    $obj->client_id                      =   $_POST['clientid'];
-                    $obj->prod_name                      =   $_POST['cprodname'];
-                    $obj->client_name                    =   $_POST['clientname'];
-                    $empInfo                             =   explode("_ ",$_POST['staff_id']);
-                    $obj->employee_id                    =   $empInfo[0];//empty($_POST["emp_id"]) ? $mySchedule->emp_id : $_POST['emp_id'];
+                    $obj->client_id                      =   $_REQUEST['clientid'];
+                    $obj->prod_name                      =   $_REQUEST['cprodname'];
+                    $obj->client_name                    =   $_REQUEST['clientname'];
+                    $empInfo                             =   explode("_ ",$_REQUEST['staff_id']);
+                    $obj->employee_id                    =   $empInfo[0];//empty($_REQUEST["emp_id"]) ? $mySchedule->emp_id : $_REQUEST['emp_id'];
                     $obj->employee_name                  =   $empInfo[1];
-                    $obj->form_id                        =   $_POST['wsid'];
-        			$obj->prod_id                        =   $_POST['prod_id'];	
-        			$obj->mag_stripe                     =   isset($_POST['mag_stripe']) ? 1:0;
-        			$obj->verve_card                     =   isset($_POST['verve']) ? 1:0;
-        			$obj->master_card                    =   isset($_POST['master_card']) ? 1:0;;
-        			$obj->visa_card                      =   isset($_POST['visa_card']) ? 1:0;;
-        			$obj->withdraw                       =   $_POST['withdraw'];
-        			$obj->withdraw_comment               =   $_POST['withdraw_area'];
-        			$obj->balance                        =   $_POST['balance'];
-        			$obj->balance_comment                =   $_POST['balance_area'];
-        			$obj->statement                      =   $_POST['statement'];
-        			$obj->statement_comment              =   $_POST['statement_area'];
-        			$obj->transfer                       =   $_POST['transfer'];
-        			$obj->transfer_comment               =   $_POST['transfer_area'];
-        			$obj->pin_change                     =   $_POST['pin_change'];
-        			$obj->pin_change_comment             =   $_POST['pin_change_area'];
-        			$obj->mobile_recharge                =   $_POST['mobile_recharge'];
-        			$obj->mobile_recharge_comment        =   $_POST['mobile_recharge_area'];
-        			$obj->camera_instal                  =   $_POST['camera'];
-        			$obj->inverter_status                =   $_POST["inverter"];
-        			$obj->AC_status                      =   $_POST["air_cond"];
-        			$obj->ATM_room_cond                  =   $_POST['atm_room'];
-        			$obj->cse_remark                     =   $_POST['cse_remark'];
-        			$obj->client_remark                  =   $_POST['client_remark'];
+                    $obj->form_id                        =   $_REQUEST['wsid'];
+        			$obj->prod_id                        =   $_REQUEST['prod_id'];	
+        			$obj->mag_stripe                     =   isset($_REQUEST['mag_stripe']) ? 1:0;
+        			$obj->verve_card                     =   isset($_REQUEST['verve']) ? 1:0;
+        			$obj->master_card                    =   isset($_REQUEST['master_card']) ? 1:0;;
+        			$obj->visa_card                      =   isset($_REQUEST['visa_card']) ? 1:0;;
+        			$obj->withdraw                       =   $_REQUEST['withdraw'];
+        			$obj->withdraw_comment               =   $_REQUEST['withdraw_area'];
+        			$obj->balance                        =   $_REQUEST['balance'];
+        			$obj->balance_comment                =   $_REQUEST['balance_area'];
+        			$obj->statement                      =   $_REQUEST['statement'];
+        			$obj->statement_comment              =   $_REQUEST['statement_area'];
+        			$obj->transfer                       =   $_REQUEST['transfer'];
+        			$obj->transfer_comment               =   $_REQUEST['transfer_area'];
+        			$obj->pin_change                     =   $_REQUEST['pin_change'];
+        			$obj->pin_change_comment             =   $_REQUEST['pin_change_area'];
+        			$obj->mobile_recharge                =   $_REQUEST['mobile_recharge'];
+        			$obj->mobile_recharge_comment        =   $_REQUEST['mobile_recharge_area'];
+        			$obj->camera_instal                  =   $_REQUEST['camera'];
+        			$obj->inverter_status                =   $_REQUEST["inverter"];
+        			$obj->AC_status                      =   $_REQUEST["air_cond"];
+        			$obj->ATM_room_cond                  =   $_REQUEST['atm_room'];
+        			$obj->cse_remark                     =   $_REQUEST['cse_remark'];
+        			$obj->client_remark                  =   $_REQUEST['client_remark'];
         			$obj->employee_id                    =   $_SESSION["emp_ident"];
                     $obj->datecreated                    =   date("Y-m-d H:i:s");
                     $obj->status                         =   "Closed";
@@ -669,9 +675,9 @@
     
     
     public function updatesignoff(){
-		if(isset($_POST['prod_id']) && !empty($_POST['prod_id']) && !empty($_POST['pgid']) && !empty($_POST['staff_id']) && !empty($_POST['clientid'])){
+		if(isset($_REQUEST['prod_id']) && !empty($_REQUEST['prod_id']) && !empty($_REQUEST['pgid']) && !empty($_REQUEST['staff_id']) && !empty($_REQUEST['clientid'])){
 			$error = array();
-            $obj = Sign_off::find_by_id($_POST['pgid']);
+            $obj = Sign_off::find_by_id($_REQUEST['pgid']);
             if(isset($_FILES['fupload']) && $_FILES['fupload']['error']==0){ //if file upload is set
 					move_uploaded_file($_FILES['fupload']['tmp_name'],"public/uploads/".basename($_FILES['fupload']['name']));
 					$image = new Imageresize(); // an instance of image resize object
@@ -705,38 +711,38 @@
 					$obj->scan_url = $photo;
 					  
 				}else{
-					$applicant->img_url = $_POST['imgvalue'];
+					$applicant->img_url = $_REQUEST['imgvalue'];
 				}
-			$obj->client_id                      =   $_POST['clientid'];
-            $obj->client_name                    =   $_POST['clientname'];
-            $obj->prod_name                      =   $_POST['cprodname'];
-            $empInfo                             =   explode("_ ",$_POST['staff_id']);
-            $obj->employee_id                    =   $empInfo[0];//empty($_POST["emp_id"]) ? $mySchedule->emp_id : $_POST['emp_id'];
+			$obj->client_id                      =   $_REQUEST['clientid'];
+            $obj->client_name                    =   $_REQUEST['clientname'];
+            $obj->prod_name                      =   $_REQUEST['cprodname'];
+            $empInfo                             =   explode("_ ",$_REQUEST['staff_id']);
+            $obj->employee_id                    =   $empInfo[0];//empty($_REQUEST["emp_id"]) ? $mySchedule->emp_id : $_REQUEST['emp_id'];
             $obj->employee_name                  =   $empInfo[1];
-            $obj->form_id                        =   $_POST['wsid'];
-			$obj->prod_id                        =   $_POST['prod_id'];	
-			$obj->mag_stripe                     =   isset($_POST['mag_stripe']) ? 1:0;
-			$obj->verve_card                     =   isset($_POST['verve']) ? 1:0;
-			$obj->master_card                    =   isset($_POST['master_card']) ? 1:0;;
-			$obj->visa_card                      =   isset($_POST['visa_card']) ? 1:0;;
-			$obj->withdraw                       =   $_POST['withdraw'];
-			$obj->withdraw_comment               =   $_POST['withdraw_area'];
-			$obj->balance                        =   $_POST['balance'];
-			$obj->balance_comment                =   $_POST['balance_area'];
-			$obj->statement                      =   $_POST['statement'];
-			$obj->statement_comment              =   $_POST['statement_area'];
-			$obj->transfer                       =   $_POST['transfer'];
-			$obj->transfer_comment               =   $_POST['transfer_area'];
-			$obj->pin_change                     =   $_POST['pin_change'];
-			$obj->pin_change_comment             =   $_POST['pin_change_area'];
-			$obj->mobile_recharge                =   $_POST['mobile_recharge'];
-			$obj->mobile_recharge_comment        =   $_POST['mobile_recharge_area'];
-			$obj->camera_instal                  =   $_POST['camera'];
-			$obj->inverter_status                =   $_POST["inverter"];
-			$obj->AC_status                      =   $_POST["air_cond"];
-			$obj->ATM_room_cond                  =   $_POST['atm_room'];
-			$obj->cse_remark                     =   $_POST['cse_remark'];
-			$obj->client_remark                  =   $_POST['client_remark'];
+            $obj->form_id                        =   $_REQUEST['wsid'];
+			$obj->prod_id                        =   $_REQUEST['prod_id'];	
+			$obj->mag_stripe                     =   isset($_REQUEST['mag_stripe']) ? 1:0;
+			$obj->verve_card                     =   isset($_REQUEST['verve']) ? 1:0;
+			$obj->master_card                    =   isset($_REQUEST['master_card']) ? 1:0;;
+			$obj->visa_card                      =   isset($_REQUEST['visa_card']) ? 1:0;;
+			$obj->withdraw                       =   $_REQUEST['withdraw'];
+			$obj->withdraw_comment               =   $_REQUEST['withdraw_area'];
+			$obj->balance                        =   $_REQUEST['balance'];
+			$obj->balance_comment                =   $_REQUEST['balance_area'];
+			$obj->statement                      =   $_REQUEST['statement'];
+			$obj->statement_comment              =   $_REQUEST['statement_area'];
+			$obj->transfer                       =   $_REQUEST['transfer'];
+			$obj->transfer_comment               =   $_REQUEST['transfer_area'];
+			$obj->pin_change                     =   $_REQUEST['pin_change'];
+			$obj->pin_change_comment             =   $_REQUEST['pin_change_area'];
+			$obj->mobile_recharge                =   $_REQUEST['mobile_recharge'];
+			$obj->mobile_recharge_comment        =   $_REQUEST['mobile_recharge_area'];
+			$obj->camera_instal                  =   $_REQUEST['camera'];
+			$obj->inverter_status                =   $_REQUEST["inverter"];
+			$obj->AC_status                      =   $_REQUEST["air_cond"];
+			$obj->ATM_room_cond                  =   $_REQUEST['atm_room'];
+			$obj->cse_remark                     =   $_REQUEST['cse_remark'];
+			$obj->client_remark                  =   $_REQUEST['client_remark'];
 			//$obj->employee_id                    =   $_SESSION["emp_ident"];
             $obj->datemodified                   =   date("Y-m-d H:i:s");
             $obj->status                         =   "Closed";
@@ -792,7 +798,130 @@
     public function getClientByID($id){
         return Client::find_by_id($id);
     }
-    
+
+
+        public function getCloseScheduleTicket($id){
+            $activityShed = Ticket::find_by_id($id);
+                if($_REQUEST['status'] == "Open"){  // Condition to check if schedule is Open
+                    $activityShed->status='Open';
+                    $activityShed->datemodified =date("Y-m-d H:i:s");
+                    $activityShed->update();
+                    $schedule = Schedule::find_by_ticket_id($id);
+                    if($schedule){
+                        $schedule->status="Open";
+                        $schedule->datemodified =date("Y-m-d H:i:s");
+                        $schedule->update();
+                    }
+                    return true;
+                }elseif($_REQUEST['status']=="Closed"){  // Condition to check if schedule is closed
+                    $activityShed->status='Closed';
+                    $activityShed->datemodified =date("Y-m-d H:i:s");
+                    $activityShed->update();
+                    $schedule = Schedule::find_by_ticket_id($id);
+                    if($schedule){
+                        $schedule->status="Closed";
+                        $schedule->datemodified =date("Y-m-d H:i:s");
+                        $schedule->update();
+                    }
+                    return true;
+                }elseif($_REQUEST['status']=="In Progress"){  // Condition to check if schedule is in progress
+                    $activityShed->status='Admin Reply';
+                    $activityShed->datemodified =date("Y-m-d H:i:s");
+                    $activityShed->update();
+                    $schedule = Schedule::find_by_ticket_id($id);
+                    if($schedule){
+                        $schedule->status="In Progress";
+                        $schedule->datemodified =date("Y-m-d H:i:s");
+                        $schedule->update();
+                    }
+                    return true;
+                }else{
+                    return false;
+                }
+
+            //echo $schedule->update();
+
+        }
+
+        public function getCloseSchedule($id){
+            $schedule = Schedule::find_by_id($id);
+            //var_dump($_POST['status']);
+
+            //Change in schedule should result in change
+            //in ticket and activation call status
+
+            /*
+                    * checks if  $activityShed is a ticket
+                    * if not then it is an activation
+                    * call change the status corresponding to
+                    * schedule status for each condition
+                    * */
+            if($_REQUEST['status'] == "Open"){  // Condition to check if schedule is Open
+
+                $schedule->status = "Open";
+                $activityShed = Ticket::find_by_id($schedule->ticket_id);
+                if($activityShed){
+                    $activityShed->status='Open';
+                    $activityShed->datemodified =date("Y-m-d H:i:s");
+                    $activityShed->update();
+                }else{
+                    $activityShed = Activation::find_by_id($schedule->ticket_id);
+                    if($activityShed){
+                        $activityShed->status = "Open";
+                        $activityShed->created_at =date("Y-m-d H:i:s");
+                        $activityShed->update();
+                    }
+
+                }
+
+                $schedule->update();
+                return true;
+            }elseif($_REQUEST['status']=="Closed"){  // Condition to check if schedule is closed
+                $schedule->status ="Closed";
+                $activityShed = Ticket::find_by_id($schedule->ticket_id);
+                if($activityShed){
+                    $activityShed->status='Closed';
+                    $activityShed->datemodified =date("Y-m-d H:i:s");
+                    $activityShed->update();
+
+                }else{
+                    $activityShed = Activation::find_by_id($schedule->ticket_id);
+
+                    if($activityShed){
+                        $activityShed->status = "Closed";
+                        $activityShed->created_at =date("Y-m-d H:i:s");
+                        $activityShed->update();
+                    }
+
+
+                }
+
+                $schedule->update();
+                return true;
+            }elseif($_REQUEST['status']=="In Progress"){  // Condition to check if schedule is in progress
+                $schedule->status ="In Progress";
+                $activityShed = Ticket::find_by_id($schedule->ticket_id);
+                if($activityShed){
+                    $activityShed->status='Admin Reply'; // admin reply stands for response for administrator for response to ticket or engineer assigned
+                    $activityShed->datemodified =date("Y-m-d H:i:s");
+                }else{
+                    $activityShed = Activation::find_by_id($schedule->ticket_id);
+                    if($activityShed){
+                        $activityShed->status = "In Progress";
+                        $activityShed->created_at =date("Y-m-d H:i:s");
+                        $activityShed->update();
+                    }
+
+                }
+
+                $schedule->update();
+                return true;
+            }else{
+                return false;
+            }
+
+            //echo $schedule->update();
+        }
     
     public function getProdPartByWorkID($id){
         return Prodpart::find_by_WSheet($id);
@@ -807,29 +936,29 @@
      */
      
      public function updateWorkSheet($id){
-        if(isset($_POST['pgid'])){
+        if(isset($_REQUEST['pgid'])){
             
-            if(isset($_POST["prod_id"])){
-                $cproduct = Cproduct::find_by_id((int)preg_replace('#[^0-9]#i','',$_POST["prod_id"]));
+            if(isset($_REQUEST["prod_id"])){
+                $cproduct = Cproduct::find_by_id((int)preg_replace('#[^0-9]#i','',$_REQUEST["prod_id"]));
             }
             
             $WorkSheet                       =    Worksheet::find_by_id((int)preg_replace('#[^0-9]#i','',$id));
-            $WorkSheet->prod_id              =   (isset($_POST["prod_id"]) && !empty($_POST["prod_id"])) ? $_POST["prod_id"] : $WorkSheet->prod_id;           
-            $WorkSheet->prod_name            =   (isset($_POST["prod_id"]) && !empty($_POST["prod_id"])) ? $cproduct->prod_name : $WorkSheet->prod_name;
-            $WorkSheet->sheet_date           =   (isset($_POST["w_date"]) && !empty($_POST["w_date"])) ? $_POST["w_date"] : $WorkSheet->sheet_date;
-            $WorkSheet->time_in              =   (isset($_POST["time_in"]) && !empty($_POST["time_in"])) ? $_POST["time_in"] : $WorkSheet->time_in;
-            $WorkSheet->time_out             =   (isset($_POST["time_out"]) && !empty($_POST["time_out"])) ? $_POST["time_out"] : $WorkSheet->time_out;
-            $WorkSheet->contact_person       =   (isset($_POST["contact_person"]) && !empty($_POST["contact_person"])) ? $_POST["contact_person"] : $WorkSheet->contact_person;
-            $WorkSheet->cse_emp_id           =   (isset($_POST["emp_id"]) && !empty($_POST["emp_id"])) ? $_POST["emp_id"] : $WorkSheet->emp_id;
-            $WorkSheet->problem              =   (isset($_POST["problem"]) && !empty($_POST["problem"])) ? $_POST["problem"] : $WorkSheet->problem;
-            $WorkSheet->cause                =   (isset($_POST["cause"]) && !empty($_POST["cause"])) ? $_POST["cause"] : $WorkSheet->cause;
-            $WorkSheet->corrective_action    =   (isset($_POST["corrective_action"]) && !empty($_POST["corrective_action"])) ? $_POST["corrective_action"] : $WorkSheet->corrective_action;
-            $WorkSheet->part_changed         =   (isset($_POST["part_changed"]) && !empty($_POST["part_changed"])) ? $_POST["part_changed"] : $WorkSheet->part_changed;
-            $WorkSheet->cse_remark           =   (isset($_POST["cse_remark"]) && !empty($_POST["cse_remark"])) ? $_POST["cse_remark"] : $WorkSheet->cse_remark;
-            $WorkSheet->client_remark        =   (isset($_POST["client_remark"]) && !empty($_POST["client_remark"])) ? $_POST["client_remark"] : $WorkSheet->client_remark;
+            $WorkSheet->prod_id              =   (isset($_REQUEST["prod_id"]) && !empty($_REQUEST["prod_id"])) ? $_REQUEST["prod_id"] : $WorkSheet->prod_id;           
+            $WorkSheet->prod_name            =   (isset($_REQUEST["prod_id"]) && !empty($_REQUEST["prod_id"])) ? $cproduct->prod_name : $WorkSheet->prod_name;
+            $WorkSheet->sheet_date           =   (isset($_REQUEST["w_date"]) && !empty($_REQUEST["w_date"])) ? $_REQUEST["w_date"] : $WorkSheet->sheet_date;
+            $WorkSheet->time_in              =   (isset($_REQUEST["time_in"]) && !empty($_REQUEST["time_in"])) ? $_REQUEST["time_in"] : $WorkSheet->time_in;
+            $WorkSheet->time_out             =   (isset($_REQUEST["time_out"]) && !empty($_REQUEST["time_out"])) ? $_REQUEST["time_out"] : $WorkSheet->time_out;
+            $WorkSheet->contact_person       =   (isset($_REQUEST["contact_person"]) && !empty($_REQUEST["contact_person"])) ? $_REQUEST["contact_person"] : $WorkSheet->contact_person;
+            $WorkSheet->cse_emp_id           =   (isset($_REQUEST["emp_id"]) && !empty($_REQUEST["emp_id"])) ? $_REQUEST["emp_id"] : $WorkSheet->emp_id;
+            $WorkSheet->problem              =   (isset($_REQUEST["problem"]) && !empty($_REQUEST["problem"])) ? $_REQUEST["problem"] : $WorkSheet->problem;
+            $WorkSheet->cause                =   (isset($_REQUEST["cause"]) && !empty($_REQUEST["cause"])) ? $_REQUEST["cause"] : $WorkSheet->cause;
+            $WorkSheet->corrective_action    =   (isset($_REQUEST["corrective_action"]) && !empty($_REQUEST["corrective_action"])) ? $_REQUEST["corrective_action"] : $WorkSheet->corrective_action;
+            $WorkSheet->part_changed         =   (isset($_REQUEST["part_changed"]) && !empty($_REQUEST["part_changed"])) ? $_REQUEST["part_changed"] : $WorkSheet->part_changed;
+            $WorkSheet->cse_remark           =   (isset($_REQUEST["cse_remark"]) && !empty($_REQUEST["cse_remark"])) ? $_REQUEST["cse_remark"] : $WorkSheet->cse_remark;
+            $WorkSheet->client_remark        =   (isset($_REQUEST["client_remark"]) && !empty($_REQUEST["client_remark"])) ? $_REQUEST["client_remark"] : $WorkSheet->client_remark;
             $WorkSheet->datemodified         =   date("Y-m-d H:i:s");
-            $WorkSheet->fund                 =   (isset($_POST["fund"]) && !empty($_POST["fund"])) ? $_POST["fund"] : $WorkSheet->fund;  
-            $WorkSheet->part_supplied        =   (isset($_POST["parts"]) && !empty($_POST["parts"])) ? $_POST["parts"] : $WorkSheet->part_supplied;
+            $WorkSheet->fund                 =   (isset($_REQUEST["fund"]) && !empty($_REQUEST["fund"])) ? $_REQUEST["fund"] : $WorkSheet->fund;  
+            $WorkSheet->part_supplied        =   (isset($_REQUEST["parts"]) && !empty($_REQUEST["parts"])) ? $_REQUEST["parts"] : $WorkSheet->part_supplied;
             
             
             
@@ -846,22 +975,104 @@
             
         }
      }
-     
-     
-     
-     
+
+     public function ActivationList($id="",$pg){
+         $purl = array();
+         if(isset($_GET['url'])){
+
+             $purl	=	$_GET['url'];
+             $purl	=	rtrim($purl);
+             $purl	=	explode('/',$_GET['url']);
+
+
+         }else{
+             $purl =null;
+         }
+         if(!isset($purl['2'])){
+             $pn = 1;
+         }else{
+             $pn = $purl['2'];
+         }
+
+
+         $statusfield ="";
+         $clientidfield ="";
+         $prodnamefield  ="";
+         $issuefield ="";
+         $locationfield ="";
+         $datefield  ="";
+
+
+         /**
+          * of all the filter fields if only one field is set
+          */
+         $filterResult ="";
+         if(isset($_REQUEST['status']) && !empty($_REQUEST['status'])){
+             if(strtolower(($_REQUEST['status'])) == "pending"){
+                 $statusfield .= " AND status = 'Admin Reply' OR status ='Customer Reply'";
+             }else{
+                 $statusfield .= " AND status = '".$_REQUEST['status']."' ";
+             }
+
+         }
+
+         if(isset($_REQUEST['clientid']) && !empty($_REQUEST['clientid'])){
+             $clientidfield .= " AND client_id='".$_REQUEST['clientid']."' ";
+         }
+
+         if(isset($_REQUEST['prodid']) && !empty($_REQUEST['prodid'])){
+             $prodnamefield .= " AND prod_id = '".$_REQUEST['prodid']."' ";
+         }
+
+         if(isset($_REQUEST['location']) && !empty($_REQUEST['location'])){
+             $locationfield .= " AND location LIKE '%".$_REQUEST['location']."%' ";
+         }
+
+         if(isset($_REQUEST['issue']) && !empty($_REQUEST['issue'])){
+             $issuefield .= " AND issue LIKE '%".$_REQUEST['issue']."%' ";
+         }
+
+
+         if(!empty($_REQUEST['fdate']) && !empty($_REQUEST['tdate'])){
+             $datefield .= " AND datecreated BETWEEN  '".$_REQUEST['fdate']."' AND '".$_REQUEST['tdate']."' ";
+         }
+         if(empty($_REQUEST['fdate']) && !empty($_REQUEST['tdate'])){
+             $datefield .= " AND datecreated < '".$_REQUEST['tdate']."' ";
+         }
+         if(!empty($_REQUEST['fdate']) && empty($_REQUEST['tdate'])){
+             $datefield .= " AND datecreated >  '".$_REQUEST['fdate']."'  ";
+         }
+
+         $filterResult .= " WHERE id !=''".$statusfield.$clientidfield.$prodnamefield.$locationfield.$issuefield.$datefield ;
+
+         global $database;
+         $resultEmployee = $database->db_query("SELECT * FROM activation ");
+         $pagin = new Pagination();//create the pagination object;
+         $pagin->nr  = $database->dbNumRows($resultEmployee);
+         $pagin->itemsPerPage = 20;
+
+         $myitems = Activation::find_by_sql("SELECT * FROM activation ".$filterResult." ORDER BY id DESC ".$pagin->pgLimit($pn));
+         //print_r($myitems);
+         $index_array =array( "activations"=>$myitems,"mypagin"=>$pagin->render($pg,"ticketlist"));
+         return $index_array;
+     }
+
+
+
+
       /**
      * method to close a ticket
      * 
      */
      
      public function closeTicket(){
-        if(isset($_POST['id']) && !empty($_POST["id"])){
-            $partTicket = Ticket::find_by_id($_POST["id"]);
+        if(isset($_REQUEST['id']) && !empty($_REQUEST["id"])){
+            $partTicket = Ticket::find_by_id($_REQUEST["id"]);
+
             $partTicket->status     =   "Closed";
             $theUser                =   Employee::find_by_id($_SESSION['emp_ident']);
             
-            $cemail                     =       (!empty($_POST['cemail'])) ? explode(",",$_POST['cemail']) : "";
+            $cemail                     =       (!empty($_REQUEST['cemail'])) ? explode(",",$_REQUEST['cemail']) : "";
             
            
            // print_r($partTicket);
@@ -877,6 +1088,13 @@
             
             
             if($partTicket->update()){
+                $schedule = Schedule::find_by_ticket_id($_REQUEST["id"]);
+                if($schedule){
+                    $schedule->status = "Closed";
+                    $schedule->update();
+
+                }
+
 				$this->sendMail("Customer",$subject ,$msg,$cemail);
                 return true;
             }else{
@@ -928,20 +1146,20 @@
 	}
     
     public function createAddPart(){
-        if(isset($_POST['itemid']) && !empty($_POST['wid'])){
-            $worksheet                              =   Worksheet::find_by_id($_POST['wid']);
-            $myItem                                 =   Items::find_by_id($_POST['itemid']);
+        if(isset($_REQUEST['itemid']) && !empty($_REQUEST['wid'])){
+            $worksheet                              =   Worksheet::find_by_id($_REQUEST['wid']);
+            $myItem                                 =   Items::find_by_id($_REQUEST['itemid']);
             $propart                                =   new Prodpart();
             
             $propart->part_name                     =   $myItem->item_name;
-            $propart->qty                           =   $_POST['qty'];
-            $propart->works_id                      =   $_POST['wid'];
+            $propart->qty                           =   $_REQUEST['qty'];
+            $propart->works_id                      =   $_REQUEST['wid'];
             $propart->prod_id                       =   $worksheet->prod_id;
-            $propart->item_id                       =   $_POST['itemid'];
+            $propart->item_id                       =   $_REQUEST['itemid'];
             $propart->datecreated                   =   date("Y:m:d H:i:s");
             $propart->des                           =   "";
-            $propart->unit_cost                     =   $_POST['price'];
-            $propart->total_cost                    =   (int)$_POST['price'] * (int)$_POST['qty'];
+            $propart->unit_cost                     =   $_REQUEST['price'];
+            $propart->total_cost                    =   (int)$_REQUEST['price'] * (int)$_REQUEST['qty'];
             
             $Tlog   =   new Transaction();
                  $Tlog->com_id                      =   $myItem->item_id;
@@ -961,9 +1179,9 @@
     }
     
     public function deletePart(){
-        if(isset($_POST['itemid'])){
+        if(isset($_REQUEST['itemid'])){
             
-            $propart        =   Prodpart::find_by_id($_POST['itemid']);
+            $propart        =   Prodpart::find_by_id($_REQUEST['itemid']);
             
                      
             if($propart->delete()){

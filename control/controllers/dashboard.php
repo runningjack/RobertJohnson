@@ -24,10 +24,11 @@ class Dashboard extends Controller{
         $this->view->oschedule           =   $dashData['oschedule'];
         $this->view->oworksheet          =   $dashData['oworksheet'];
         $this->view->clients            =   $dashData['clients'];
+        $this->view->pendings           = $dashData['openPend'];
         $this->view->cproducts          =   $dashData['cproducts'];
         $lastmonth                      =   (int)date("n")-1;
         $curmonth                       =   date("n");
-       
+
         $this->view->monthreport        =   $this->model->getMonthlyReportFinance(" Month(datecreated) ='".$curmonth."' AND Year(datecreated)='".date("Y")."'");
         $this->view->lastmonthreport    =   $this->model->getLastMonthlyReportFinance(" Month(datecreated) ='".$lastmonth."' AND Year(datecreated)='".date("Y")."'");
         $this->view->thisquarter        =   $this->model->getThisQuaterReportFinance(" Quarter(datecreated) ='".self::date_quarter()."' AND Year(datecreated)='".date("Y")."'");

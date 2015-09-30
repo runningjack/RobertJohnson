@@ -4,22 +4,23 @@
 <div class="panel callout">
 	<h4 style="display:inline">Employee Listing</h4>
     <a href="<?php echo $uri->link("employees/create") ?>"><span class="button secondary right" style="display:inline">Add New</span></a>
-    <a href="<?php 
-    global $session; 
+    <?php
+    global $session;
     //echo $session->department;
     //print_r($session->privil);
-    
+
     if($session->department=="Technical Department" && in_array("itdepartment", $session->privil) && $session->rolename=="Customer Support Engineer"){
-        echo $uri->link("dasboard/index");
+        echo" <a href='".  $uri->link("dasboard/index")."'><span class='btn btn-primary button right' style='display:inline'> &laquo;Back To Dashboard</span></a>";
     }elseif($session->rolename=="Customer Support Service" && in_array("support", $session->privil)){
-        echo $uri->link("dashboard/index");
+        echo" <a href='".  $uri->link("dashboard/index")."'><span class='btn btn-primary button right' style='display:inline'> &laquo;Back To Dashboard</span></a>";
     }elseif(($session->department=="Humman Resource" || $session=="Human Resource Deparment")){
-        
+
     }elseif((($session->rolename=="Super Admin") || $session->rolename=="General Manager") && $session->department=="Technical Department"){
-        echo $uri->link("dashboard/index");       
+        echo" <a href='".  $uri->link("dashboard/index") ."'><span class='btn btn-primary button right' style='display:inline'> &laquo;Back To Dashboard</span></a>";
     }
-     
-    ?>"><span class="btn btn-primary button right" style="display:inline"> &laquo;Back To Dashboard</span></a>
+
+    ?>
+
 </div>
 <div id='transalert'></div>
 <div class="row filterbox" >
@@ -69,6 +70,63 @@
 <div id='emplisting'>
 <?php echo $this->myemployee; ?>
 </div>
+
+
+
+<script type="text/javascript">
+    (function($) {
+        "use strict";
+        $('#example').dataTable({
+            "order": [
+                [3, "desc"]
+            ]
+        });
+    })(jQuery);
+
+
+
+    (function($) {
+        "use strict";
+        $('#footable-res2').footable().bind('footable_filtering', function(e) {
+            var selected = $('.filter-status').find(':selected').text();
+            if (selected && selected.length > 0) {
+                e.filter += (e.filter && e.filter.length > 0) ? ' ' + selected : selected;
+                e.clear = !e.filter;
+            }
+        });
+
+        $('.clear-filter').click(function(e) {
+            e.preventDefault();
+            $('.filter-status').val('');
+            $('table.demo').trigger('footable_clear_filter');
+        });
+
+        $('.filter-status').change(function(e) {
+            e.preventDefault();
+            $('table.demo').trigger('footable_filter', {
+                filter: $('#filter').val()
+            });
+        });
+
+        $('.filter-api').click(function(e) {
+            e.preventDefault();
+
+            //get the footable filter object
+            var footableFilter = $('table').data('footable-filter');
+
+            alert('about to filter table by "tech"');
+            //filter by 'tech'
+            footableFilter.filter('tech');
+
+            //clear the filter
+            if (confirm('clear filter now?')) {
+                footableFilter.clearFilter();
+            }
+        });
+    })(jQuery);
+</script>
+
+
 
 
 

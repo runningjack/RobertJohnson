@@ -17,8 +17,12 @@ class Dashboard_Model extends Model{
 		$awaiting_ticket_count        =   ($database->dbNumRows($database->db_query("SELECT * FROM support_ticket WHERE status ='Customer Reply' ")));
         $closed_worksheet_count       =   ($database->dbNumRows($database->db_query("SELECT * FROM work_sheet_form WHERE status ='Closed' ")));
         $client_count                 =   ($database->dbNumRows($database->db_query("SELECT * FROM tbl_client")));  
-        $client_products              =   ($database->dbNumRows($database->db_query("SELECT * FROM client_product"))); 
-		$darray                       =   array("cproducts"=>$client_products,"clients"=>$client_count,"oworksheet"=>$open_worksheet_count,"oschedule"=>$open_schedule_count,"otcount"=>$open_ticket_count,"atcount"=>$awaiting_ticket_count);
+        $client_products              =   ($database->dbNumRows($database->db_query("SELECT * FROM client_product")));
+        //$schedule
+        $openPendings          =Ticket::find_by_sql("SELECT * FROM support_ticket WHERE (status ='Admin Reply' OR status='Customer Reply') OR  status ='Open' ");
+        // print_r($openPendings);
+         $clients = Client::find_all();
+		$darray                       =   array("cproducts"=>$client_products,"clients"=>$clients,"oworksheet"=>$open_worksheet_count,"oschedule"=>$open_schedule_count,"otcount"=>$open_ticket_count,"atcount"=>$awaiting_ticket_count,"openPend"=>$openPendings);
 		return $darray;
      }
      

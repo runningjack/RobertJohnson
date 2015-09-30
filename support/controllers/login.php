@@ -52,6 +52,10 @@ class Login extends Controller{
 	   @$this->loadModel("Login");
 		$username = $_POST["username"];
 		$password = $_POST["password"];
+        if(empty($_POST['userole'])){
+            echo 3;
+            exit;
+        }
         if(strtolower($_POST["userole"]) === "admin"){
             if($this->model->runClient($username,$password)){
                 echo 1;
@@ -75,13 +79,12 @@ class Login extends Controller{
         @$this->loadModel("Login");
 		$username = $_POST["username"];
 		$password = $_POST["password"];
-
 		if($this->model->runClient($username,$password)){
-		
-		echo 1;
+		    echo 1;
 		}else{
-		      echo 2;
+		    echo 2;
 		}
+
     }
     
     public function sendMail($fname,$lname,$mname,$pass,$uname,$email){

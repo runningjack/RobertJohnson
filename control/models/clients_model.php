@@ -27,6 +27,59 @@ class Clients_Model extends Model
 			$obj->email		=	$_POST['email'];
 			$obj->descr		=	$_POST['desc'];
 			$obj->username	=	$_POST['username'];
+
+            $phpFileUploadErrors = array(
+                0 => 'There is no error, the file uploaded with success',
+                1 => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+                2 => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+                3 => 'The uploaded file was only partially uploaded',
+                4 => 'No file was uploaded',
+                6 => 'Missing a temporary folder',
+                7 => 'Failed to write file to disk.',
+                8 => 'A PHP extension stopped the file upload.',
+            );
+
+            if(isset($_FILES['fupload']) && $_FILES['fupload']['error']==0){ //if file upload is set
+                move_uploaded_file($_FILES['fupload']['tmp_name'],"../public/uploads/".basename($_FILES['fupload']['name']));
+                $image = new Imageresize(); // an instance of image resize object
+                $image->load("../public/uploads/".basename($_FILES['fupload']['name']));
+                //$image->image =;
+                $image->resize(400,400);
+                $image->save("../public/uploads/".basename($_FILES['fupload']['name']));
+
+                //this section is needed to get the extension for image type in renaming the image
+                if ($_FILES['fupload']['type']=="image/gif"){
+                    $ext = ".gif";
+                }
+                if ($_FILES['fupload']['type']=="image/png"){
+                    $ext = ".png";
+                }
+                if ($_FILES['fupload']['type']=="image/jpeg"){
+                    $ext = ".jpeg";
+                }
+                if ($_FILES['fupload']['type']=="image/pjpeg"){
+                    $ext = ".jpeg";
+                }
+                if ($_FILES['fupload']['type']=="image/gif"){
+                    $ext = ".gif";
+                }
+                if ($_FILES['fupload']['type']=="image/jpg"){
+                    $ext = ".jpg";
+                }
+                $new_name = uniqid()."_".time().$ext; //new name for the image
+                rename("../public/uploads/".basename($_FILES['fupload']['name']),"../public/uploads/".$new_name);
+                $photo = $new_name;
+                $obj->image = $photo;
+
+            }else{
+                //$applicant->img_url = $_REQUEST['imgvalue'];
+
+                echo $phpFileUploadErrors[$_FILES['fupload']['error']];
+                exit;
+            }
+
+
+
 			if($_POST['password'] == $_POST['r_password']){
 				$obj->password	=	$_POST['password'];
 			}else array_push($error, "Password do not match");

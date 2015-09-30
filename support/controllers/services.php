@@ -62,14 +62,31 @@ $this->view->myservs = $servicelist;
             $this->loadModel("Services");
             $result = $this->model->activate();
             if($result ==1){
-                $_SESSION['message'] = "<div data-alert class='alert-box error'><a href='#' class='close'>&times;</a>Activation Request Sent</div>";
+                $_SESSION['message'] = "<div  class='alert alert-success alert-dismissible'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>Activation Request Sent</div>";
             }elseif($result ==2){
-                $_SESSION['message'] ="<div data-alert class='alert-box error'><a href='#' class='close'>&times;</a>Unexpected Error</div>";
+                $_SESSION['message'] ="<div  class='alert alert-danger alert-dismissible'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>Unexpected Error</div>";
             }else{
-                $_SESSION['message'] ="<div data-alert class='alert-box error'><a href='#' class='close'>&times;</a>Record Not created ensure that all mandatory fields are filled</div>";
+                $_SESSION['message'] ="<div  class='alert alert-danger alert-dismissible'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>Record Not created ensure that all mandatory fields are filled</div>";
             }
             //$this->view->render("services/activate");
-            redirect_to($this->uri->link("services/activate"));
+            redirect_to($this->uri->link("supportticket/activationlist"));
+        }
+
+
+        public  function doUpdateActivate(){
+            global $session;
+            $this->loadModel("Services");
+            $result = $this->model->updateActivate();
+            if($result ==1){
+                $_SESSION['message'] = "<div  class='alert alert-success alert-dismissible'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>Activation Request Updated</div>";
+                redirect_to($this->uri->link("supportticket/activationlist"));
+            }elseif($result ==2){
+                $_SESSION['message'] ="<div  class='alert alert-danger alert-dismissible'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>Unexpected Error</div>";
+            }else{
+                $_SESSION['message'] ="<div  class='alert alert-danger alert-dismissible'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>Record Not Updated ensure that all mandatory fields are filled</div>";
+            }
+            //$this->view->render("services/activate");
+
         }
 
 

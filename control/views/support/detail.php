@@ -5,27 +5,20 @@
 <div id="searchdata2"  >
     <div class="large-12 columns">
         <div class="large-3 columns">
-            <strong>Start Date</strong>
+            <strong>Start Date</strong><!--data-inputmask="'alias': 'yyyy-mm-dd'" data-mask=""-->
         </div>
         <div class="large-9 columns">
-            
-            <input type="date" name="taskdate" id="taskdate" />
+            <input type="text" name="taskdate" id="taskdate" class="form-control" >
         </div>
-        
-        
-        
         <div class="large-3 columns">
             <strong>maintenance Type</strong>
         </div>
         <div class="large-9 columns">
-            
             <select  name="mtype" id="mtype">
                 <option value="Corrective"> Corrective Maintenance </option>
                 <option value="Preventive"> Preventive Maintenance </option>
             </select>
         </div>
-        
-        
         <div class="large-3 columns">
             <strong>Issue</strong>
         </div>
@@ -38,14 +31,15 @@
             <strong>Technician</strong>
         </div>
         <div class="large-9 columns">
-            <select name="emp" id="emp">
+            <input type="text" id="emp" name="emp" class="form-control">
+           <!-- <select name="emp" id="emp">
             	<?php
-				$employees = Employee::find_all();
+/*				$employees = Employee::find_all();
 				foreach($employees as $emp){
 					echo "<option value='$emp->id'>$emp->emp_id; $emp->emp_fname $emp->emp_lname</option>";
 				}
-			     ?>
-            </select>
+			     */?>
+            </select>-->
             
         </div>
     </div>
@@ -61,6 +55,9 @@
 </div>
 <a class="close-reveal-modal"><img src="public/icons/Close16.png" width="16" height="16" /></a>
 </div>
+
+
+
 
 
 
@@ -84,8 +81,21 @@
 </div>
 <div class="row">
 
-<div id='ticketlisting'>
- <?php echo $this->myReplyData; ?>
-</div>
+    <div class="large-12 columns">
+        <div class="box">
+            <div class="box-header bg-transparent">
+
+                <h3 class="box-title"><i class=""></i>
+                    <span>RECENT CLIENT TICKETS</span>
+                </h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body " style="display: block;">
+                <div id='ticketlisting'>
+                 <?php echo $this->myReplyData; ?>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <!--</div> -->

@@ -20,8 +20,9 @@
     <a href="<?php echo $uri->link("clients/index") ?>"><span class="button secondary right" style="display:inline"> &laquo;Back To Listing</span></a>
 </div>
 
-<form id="frmAddClient" method="post" action="<?php echo $uri->link("clients/doCreate") ?>" >
-  <fieldset><div id="transalert"></div>
+<form id="frmAddClient" method="post" action="<?php echo $uri->link("clients/doCreate") ?>" enctype="multipart/form-data" >
+
+  <fieldset><div id="transalert"><?php echo (isset($_SESSION['message']) && !empty($_SESSION['message'])) ? $_SESSION['message'] : "" ?></div>
     <legend>Create Client</legend>
 
     <div class="row">
@@ -81,6 +82,13 @@
         </select>
       </div>
     </div>
+
+      <div class="row">
+          <div class="large-12 columns">
+              <label>Logo</label>
+              <input type="file"  name="fupload" />
+          </div>
+      </div>
     
     <div class="row">
       <div class="large-12 columns">

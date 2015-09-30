@@ -1,5 +1,6 @@
 <?php
 class Supportticket extends Controller{
+
 	function __construct(){
 		parent::__construct();
 		global $session;
@@ -24,7 +25,7 @@ class Supportticket extends Controller{
 		".$datum['mypagin']."
 		<table class='table table-striped table-bordered' width='100%' id='datatable_fixed_column'>
 			<thead><tr>
-				<th width='15%'>Date Created</th><th width='10%'>Ticket ID</th><th width='40%'>Subject</th><th width='5%'>Status </th><th width='10%'>Department </th><th width='10%'>Last Reply</th><th width='10%'></th>
+				<th width='15%'>Date Created</th><th width='10%'>Ticket ID</th><th>Terminal ID</th><th width='40%'>Subject</th><th width='5%'>Status </th><th width='10%'>Department </th><th width='10%'>Last Reply</th><th width='10%'></th>
 			</tr>
 			</thead>
 			<tbody>";
@@ -33,14 +34,14 @@ class Supportticket extends Controller{
 				  $x =1;
 				foreach($this->view->mytickets as $ticket){
 				$ticketlist .="<tr>
-					<td>".date_format(new DateTime($ticket->datecreated),"M d Y g:ia")."</td><td>$ticket->id</td><td>$ticket->subject </td><td><span class='";
+					<td>".date_format(new DateTime($ticket->datecreated),"M d Y g:ia")."</td><td>$ticket->id</td><td>$ticket->terminal_id</td><td>$ticket->subject </td><td><span class='";
                     if(strtolower($ticket->status) == "open"){
                         $ticketlist .=" label bg-red ";
                     }elseif(strtolower($ticket->status) == "closed"){
                         $ticketlist .=" label bg-green ";
-                    }elseif(strtolower($ticket->status) == "admin reply"){
+                    }elseif(strtolower($ticket->status) == "admin reply" || strtolower($ticket->status)=="customer reply"){
                         $ticketlist .=" label bg-blue ";
-                    } $ticketlist .="'>"; $ticketlist .= $ticket->status =="Admin Reply" ? "Pending" : $ticket->status ; $ticketlist .="</span></td><td>$ticket->department</td><td>".date_format(new DateTime($ticket->datemodified),"M d Y g:ia")."</td><td><a href='".$uri->link("supportticket/detail/".$ticket->id."")."'>View Ticket</a></td>
+                    } $ticketlist .="'>"; $ticketlist .= ($ticket->status =="Admin Reply" || $ticket->status =="Customer Reply") ? "Pending" : $ticket->status ; $ticketlist .="</span></td><td>$ticket->department</td><td>".date_format(new DateTime($ticket->datemodified),"M d Y g:ia")."</td><td><a href='".$uri->link("supportticket/detail/".$ticket->id."")."'>View Ticket</a></td>
 				</tr>";
 				$x++;
 				}
@@ -55,9 +56,62 @@ class Supportticket extends Controller{
 			$this->view->myvends = $ticketlist;
 		$this->view->render("supportticket/index");
 	}
-	
-	
-	public function create($id = ""){
+
+
+
+    public function activationlist($mid=1){
+        $ticketlist ="";
+        if(empty($mid)){
+            redirect_to($this->uri->link("error/index"));
+            exit;
+        }
+        @$this->loadModel("Supportticket");
+        $datum = $this->model->getListActivation("","supportticket");
+        $this->view->mytickets =$datum['supportticket'];
+        $uri = new Url("");
+        $ticketlist .="<table class='table table-striped table-bordered' width='100%' id='datatable_fixed_column'>
+			<thead><tr>
+				<th>Date Created</th><th >Terminal ID</th><th>Product</th><th>Status</th><th>Atm Type </th><th> Location</th><th>Branch</th><th >Contact</th><th>Contact Phone</th><th></th><th></th>
+			</tr>
+			</thead>
+			<tbody>";
+
+        if($this->view->mytickets){
+            $x =1;
+            foreach($this->view->mytickets as $ticket){
+                $ticketlist .="<tr>
+					<td>".date_format(date_create($ticket->created_at),"M d Y g:ia")."</td><td>$ticket->terminal_id</td><td>$ticket->product_name </td><td><span class='";
+                if(strtolower($ticket->status) == "open"){
+                    $ticketlist .=" label bg-red ";
+                }elseif(strtolower($ticket->status) == "closed"){
+                    $ticketlist .=" label bg-green ";
+                }elseif(strtolower($ticket->status) == "admin reply" || strtolower($ticket->status)=="customer reply"){
+                    $ticketlist .=" label bg-blue ";
+                } $ticketlist .="'>"; $ticketlist .= ($ticket->status =="Admin Reply" || $ticket->status =="Customer Reply") ? "Pending" : $ticket->status ; $ticketlist .="</span></td><td>$ticket->atm_type</td><td>$ticket->location</td><td>$ticket->branch</td><td>$ticket->contact_name</td><td>$ticket->contact_phone</td><td>";
+                if($ticket->status =="Closed" || $ticket->status =="In Progress"){
+
+                }else{
+                    $ticketlist .="<a href='".$uri->link("supportticket/editActivation/".$ticket->id."")."'>Edit</a>";
+                }
+
+
+                $ticketlist .="</td><td><a href='".$uri->link("supportticket/actdetails/".$ticket->id."")."'>Details</a></td></tr>";
+                $x++;
+            }
+        }else{
+            $ticketlist .= "<tr><td colspan='7'>No record to display</td></tr>";
+        }
+
+        $ticketlist .= "</tbody>
+			</table>
+			";
+
+        $this->view->activations = $ticketlist;
+        $this->view->render("supportticket/activationlist");
+    }
+
+
+    public function create($id = ""){
 		@$this->loadModel("Supportticket");
 		if($id != ""){
 			$this->view->product = Cproduct::find_by_id($id);	
@@ -78,6 +132,24 @@ class Supportticket extends Controller{
 		//$this->view->mymenu = $this->model->getById($id);
 		$this->view->render("supportticket/create");
 	}
+
+    public function editActivation($id){
+        @$this->loadModel("Supportticket");
+        $datum = $this->model->getData();
+        $myActivation = $this->model->getActivationData($id);
+        //$this->view->state = $datum['state'];
+        $this->view->country = $datum['country'];
+        $this->view->products  = $datum['products'];
+        $this->view->activation = $myActivation;
+
+        $this->view->render("supportticket/activationdetails");
+    }
+
+
+    public function actdetails($id){
+        $this->view->activation = Activation::find_by_id($id);
+        $this->view->render("supportticket/actdetails");
+    }
     
     public function detail($id=""){
 	   @$this->loadModel("Supportticket");
@@ -99,7 +171,7 @@ class Supportticket extends Controller{
          */
          if($ticket){
 			 $pgdetail .= "<div class='row'>
-     	<div class='btn-group'><a href='".$uri->link("supportticket/index")."'class='btn btn-info' >&laquo; Back</a> <a href='#' id='dh' class='btn btn-primary'> Reply </a>"; ($ticket->status !="Closed") ? $pgdetail .="<a href='#' id='close' class='btn btn-danger' >Close Ticket </a>" : ""; $pgdetail .="</div>
+     	<div class='btn-group'><a href='".$uri->link("supportticket/index")."'class='btn btn-info' >&laquo; Back</a>"; $pgdetail .= $ticket->status =="Closed" ? " " : "<a href='#' id='dh' class='btn btn-primary'> Reply </a>"; ($ticket->status !="Closed") ? $pgdetail .="<a href='#' id='close' class='btn btn-danger' >Close Ticket </a>" : ""; $pgdetail .="</div>
      </div>";
 	 
 	 
@@ -107,7 +179,7 @@ class Supportticket extends Controller{
          
          <div id='hideme'><form action='". $uri->link("supportticket/doCreateClientReply/".$ticket->id."") ."' method='post' enctype='multipart/form-data' name='frmEmp3' id='frmEmp3'>
 	     <fieldset><div id='transalert'></div>
-   	       
+
 	            <table class='table' border='0'>
 		              <tr>
 		                <td width='39%'>
@@ -155,26 +227,26 @@ class Supportticket extends Controller{
           </fieldset>
            </form></div>";
             $pgdetail .="<div id='granddiv'><div id='divclose'><div class='row'>
-     	<div class='ticketdetailscontainer'>
-        <div class='col-3'>
+     	<div class='row ticketdetailscontainer'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Submitted
                 <div class='detail'>".$ticket->datecreated."</div>
             </div>
         </div>
-        <div class='col-3'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Department
                 <div class='detail'>$ticket->department</div>
             </div>
         </div>
-        <div class='col-3'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Priority
                 <div class='detail'>$ticket->priority</div>
             </div>
         </div>
-        <div class='col-3'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Status
                 <div class='detail'>"; $pgdetail .= ($ticket->status =="Open") ? "<span style='color:#779500'>Open</span>" : "<span style='color:#f00'>$ticket->status</span>" ; $pgdetail .="</div>
@@ -236,8 +308,7 @@ class Supportticket extends Controller{
         $this->view->myReplyData = $pgdetail;
 		$this->view->render("supportticket/detail");
 	}
-    
-    
+
     public function doCreate(){
 		@$this->loadModel("Supportticket");
 		$result = $this->model->create();
@@ -259,13 +330,12 @@ class Supportticket extends Controller{
       echo"<div data-alert class='alert-box alert'>Unexpected Error! Record not Saved <a href='#' class='close'>&times;</a></div>";
 		}	
 	}
-    
-    
+
     public function doCreateClientReply($id){
 		@$this->loadModel("Supportticket");
 		if($this->model->createClientReply($id)===1){
 			//echo"<div data-alert class='alert-box success'>Record Saved <a href='#' class='close'>&times;</a></div>";
-			
+		$_SESSION['message']="Reply Sent to RJ Support Team";
 		$datum = $this->model->getData();
         $replyData = $this->model->getTicketData($id);
         //$this->view->state = $datum['state'];
@@ -274,7 +344,18 @@ class Supportticket extends Controller{
         $replies    =   $replyData["replies"];
        
         
-        $pgdetail ="<div data-alert class='alert-box success'>Record Saved <a href='#' class='close'>&times;</a></div>";
+        $pgdetail ="<div id='transalert'></div>
+
+
+        <div class='alert alert-success alert-dismissable'>
+                    <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>×</button>
+                    <h4>	<i class='icon fa fa-check'></i> Alert!</h4>
+                   Ticket Successfully sent.
+                  </div>
+
+
+
+       ";
         
         
         /**
@@ -282,26 +363,26 @@ class Supportticket extends Controller{
          */
          if($ticket){
             $pgdetail .="<div id='divclose'><div class='row'>
-     	<div class='ticketdetailscontainer'>
-        <div class='col-3'>
+     	<div class='row ticketdetailscontainer'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Submitted
                 <div class='detail'>".$ticket->datecreated."</div>
             </div>
         </div>
-        <div class='col-3'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Department
                 <div class='detail'>$ticket->department</div>
             </div>
         </div>
-        <div class='col-3'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Priority
                 <div class='detail'>$ticket->priority</div>
             </div>
         </div>
-        <div class='col-3'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Status
                 <div class='detail'>"; $pgdetail .= ($ticket->status =="Open") ? "<span style='color:#779500'>Open</span>" : "<span style='color:#f00'>$ticket->status</span>" ; $pgdetail .="</div>
@@ -377,26 +458,26 @@ class Supportticket extends Controller{
            
          $pgdetail ="";     
             $pgdetail .="<div id='divclose'><div class='row'>
-     	<div class='ticketdetailscontainer'>
-        <div class='col-3'>
+     	<div class='row ticketdetailscontainer'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Submitted
                 <div class='detail'>".$ticket->datecreated."</div>
             </div>
         </div>
-        <div class='col-3'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Department
                 <div class='detail'>$ticket->department</div>
             </div>
         </div>
-        <div class='col-3'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Priority
                 <div class='detail'>$ticket->priority</div>
             </div>
         </div>
-        <div class='col-3'>
+        <div class='col-lg-3'>
             <div class='internalpadding'>
                 Status
                 <div class='detail'>"; $pgdetail .= ($ticket->status =="Open") ? "<span style='color:#779500'>Open</span>" : "<span style='color:#f00'>$ticket->status</span>" ; $pgdetail .="</div>
@@ -409,11 +490,9 @@ class Supportticket extends Controller{
   	 </div>";
             
          }
-         
-    
-         
+
   	 $pgdetail .= "<div class='row'>
-     	<div class='btn-group'><a href='#'   class='btn Action' onclick='window.location='".$uri->link("supportticket/index")."' >&laquo; Back</a> <a href='#' id='dh' class='btn btn-primary'> Reply </a>"; ($ticket->status !="Closed") ? $pgdetail .="<a href='#' id='close' class='btn btn-danger' >Close Ticket </a>" : ""; $pgdetail .="</div>
+     	<div class='btn-group'><a href='#'   class='btn Action' onclick='window.location='".$uri->link("supportticket/index")."' >&laquo; Back</a>"; $ticket->status =="Closed" ? "" :  $pgdetail .="<a href='#' id='dh' class='btn btn-primary'> Reply </a>"; $pgdetail .=  ($ticket->status !="Closed") ? "<a href='#' id='close' class='btn btn-danger' >Close Ticket </a>" : ""; $pgdetail .="</div>
      </div>";
         }
         
@@ -450,5 +529,6 @@ class Supportticket extends Controller{
 			$this->view->myvends = $ticketlist;
 		$this->view->render("supportticket/index");
 	}
+
 }
 ?>

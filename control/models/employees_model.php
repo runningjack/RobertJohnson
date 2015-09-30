@@ -15,8 +15,7 @@ class Employees_Model extends Model{
 			$purl	=	$_GET['url'];
 			$purl	=	rtrim($purl);
 			$purl	=	explode('/',$_GET['url']);
-			
-			
+
 		}else{
 			$purl =null;	
 		}
@@ -55,9 +54,9 @@ class Employees_Model extends Model{
 		$resultEmployee = $database->db_query("SELECT * FROM employee");
 		$pagin = new Pagination();//create the pagination object;
 		$pagin->nr  = $database->dbNumRows($resultEmployee);
-		$pagin->itemsPerPage = 20;
+		$pagin->itemsPerPage = 50;
 		
-		$customers = Employee::find_by_sql("SELECT * FROM employee ".$filterResult." ORDER BY id DESC ".$pagin->pgLimit($pn));
+		$customers = Employee::find_by_sql("SELECT * FROM employee ".$filterResult." ORDER BY id DESC ");
 		$index_array =array( "myemployee"=>$customers,"mypagin"=>$pagin->render($pg));
 		return $index_array;
 	}
@@ -94,8 +93,7 @@ class Employees_Model extends Model{
      public function getEmpINS($id){
        return Empinstitution::find_by_empID($id);        
      }
-     
-     
+
      /**
      * this section gets the pool of emp referee
      * data from the database table
@@ -104,8 +102,7 @@ class Employees_Model extends Model{
      public function getEmpRef($id){
        return Empreferee::find_by_empID($id);        
      }
-     
-     
+
      /**
       * this section is reqired to
       * insert a new employee wk expereince
@@ -435,8 +432,7 @@ class Employees_Model extends Model{
 		$startups 		= array("departs"=>$depts,"country"=>$country,"state"=>$zone,"employee"=>$employee,"role"=>$role);
 		return $startups;		
 	}
-    
-    
+
     /**
      * use with jquery to porpulate the local government  
      * listitem in  form 
@@ -448,7 +444,7 @@ class Employees_Model extends Model{
     }
     
 	public function create(){
-		if(!empty($_POST['lname']) && !empty($_POST['fname']) && !empty($_POST['gender']) && !empty($_POST['mstatus'])  && !empty($_POST['dob']) && !empty($_POST['nationality']) && !empty($_POST['soo'])  && !empty($_POST['address'])){
+		if(!empty($_POST['lname']) && !empty($_POST['fname'])  && !empty($_POST['phone']) && !empty($_POST['email']) && !empty($_POST['address'])){
 			
 			$applicant = new Employee();
 			if(isset($_FILES['fupload']) && $_FILES['fupload']['error']==0){ //if file upload is set
@@ -503,20 +499,19 @@ class Employees_Model extends Model{
 			$applicant->emp_email				=	$_POST['email'];
 			$applicant->emp_phone			    =	$_POST['phone'];
             $applicant->emp_uname               =   $_POST['email'];
-            $applicant->emp_pword               =   crypt(Employee::generatePassword(8,2),'$2a$07$usesomesillystringforsalt$');
+            $pass                               =   Employee::generatePassword(8,2);
+            $applicant->emp_pword               =   crypt($pass,'$2a$07$usesomesillystringforsalt$');
             $applicant->emp_id                  =   Employee::getID2("RJH/S/","tblemp", $applicant->emp_fname. " ". $applicant->emp_lname);
 		
 			$applicant->datecreated		    =	date("Y-m-d H:i:s");
-			$applicant->create();
-			if(true){
-			 //print_r($applicant);
-			 //$this->sendMail($applicant->fname,$applicant->lname,$applicant->emp_mname,$applicant->emp_pword ,$applicant->emp_uname,$applicant->emp_email );
+
+			if($applicant->create()){
+
+			 $this->sendMail($applicant->fname,$applicant->lname,$applicant->emp_mname,$pass ,$applicant->emp_uname,$applicant->emp_email );
 				 return 1;     //returns 1 on success                        
 			}else{
 			     return 2;       // returns 2 on insert error
 			}
-			
-			
 		}else{
 		  return 3; //returns 3 if requiered input field is not supplied
 		}
@@ -582,13 +577,14 @@ class Employees_Model extends Model{
 			$applicant->emp_email				=	$_POST['email'];
 			$applicant->emp_phone			    =	$_POST['phone'];
             $applicant->emp_uname               =   $_POST['email'];
-            //$applicant->emp_pword               =   crypt(Employee::generatePassword(8,2),'$2a$07$usesomesillystringforsalt$');
+            //$pass                               =   Employee::generatePassword(8,2);
+            //$applicant->emp_pword               =   crypt($pass,'$2a$07$usesomesillystringforsalt$');
             //$applicant->emp_id                  =   Employee::getID2("RJH/S/","tblemp", $applicant->emp_fname. " ". $applicant->emp_lname);
 		
 			$applicant->datemodified		    =	date("Y-m-d H:i:s");
 			
 			if($applicant->update()){
-			 $this->sendMail($applicant->fname,$applicant->lname,$applicant->emp_mname,$applicant->emp_pword ,$applicant->emp_uname,$applicant->emp_email );
+			 //$this->sendMail($applicant->fname,$applicant->lname,$applicant->emp_mname,$pass ,$applicant->emp_uname,$applicant->emp_email );
 				return 1;     //returns 1 on success                        
 			}else{
 			 return 2;       // returns 2 on insert error
@@ -599,18 +595,43 @@ class Employees_Model extends Model{
 		  return 3; //returns 3 if requiered input field is not supplied
 		}
 	}
-    
-    
-    
-    
-    
-    
+
     public function sendMail($fname,$lname,$mname,$pass,$uname,$email){
+        $to = $email;
+        $subject = 'Technician Registration';
+        $headers = "From: RJ SUPPORT rjsupport@robertjohnsonsupport.com\r\n";
+        $headers .= "Reply-To: rjsupport@robertjohnsonsupport.com\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+        $headers .=  'X-Mailer: PHP/' . phpversion()."\r\n";
+        /* $smtp = \Mail::factory('smtp', array(
+             'host' => 'ssl://n1plcpnl0021.prod.ams1.secureserver.net',
+             'port' => '465',
+             'auth' => true,
+             'username' => 'rjsupport@robertjohnsonsupport.com',
+             'password' => 'rjsupport2015'
+         ));*/
+        $message = "Dear $fname $mname ". strtoupper($lname);
+        $message .= "<br><p> Here is your login details are as follows, this will be required to login into your staff portal to access your account</p>
+                        <ul style='list-style:none; list-style-image:none;'>
+                            <li><b>Username: </b>".$uname."</li>
+                            <li><b>Password: </b>".$pass."</li>
+                        </ul>
+                        <p>Please keep these as they will be required when you want to access your account portal on the Chartered Marketers Auction Website </p>";
+
+        if(mail($to, $subject, $message, $headers)){
+            return true;
+        }else return false;
+
+    }
+
+
+    public function sendMail2($fname,$lname,$mname,$pass,$uname,$email){
 		$mail                                     = new Mail(); 
 		$template                                 = new Mailtemplate();
 		$template->data['mail_from']              = "Robert Johnson Holdings";
-		$template->data['web_url']                = "http://robertjohnsonholdings.com";
-		$template->data['logo']                   = "http://robertjohnsonholdings.com/public/img/logo.png";
+		$template->data['web_url']                = "http://robertjohnsonsupport.com";
+		$template->data['logo']                   = "http://robertjohnsonsupport.com/public/img/logo.png";
 		$template->data['company_name']           = "Robert Johnson Holdings";
 		$template->data['text_from']              = "Robert Johnson Holdings";
 		$template->data['text_greeting']          ="Dear $fname $mname ". strtoupper($lname) ;// $_POST['subject'];
@@ -624,10 +645,10 @@ class Employees_Model extends Model{
                         <p>Please keep these as they will be required when you want to access your account portal on the Chartered Marketers Auction Website </p>";
 				
 				$mail->setTo($email);
-				$mail->setFrom("register@robertjohnsonholdings.com");
-				$mail->setSender("Chartered Marketers Auction.");
+				$mail->setFrom("rjsupport@robertjohnsonsupport.com");
+				$mail->setSender("RobertJohnson Support.");
 				$mail->setSubject("Robert Johnson Holdings Registration");
-				$mail->setHtml($template->gettmp('http://robertjohnsonholdings.com/emailtmp/email1.tpl'));				
+				$mail->setHtml($template->gettmp('http://robertjohnsonsupport.com/control/emailtmp/email1.tpl'));
 				if($mail->send()){
 					return true;
 				}else{

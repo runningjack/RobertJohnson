@@ -62,11 +62,48 @@
             }else array_push($error,"Terminal ID");
 
             if(empty($error)){
+                $cproduct= Cproduct::find_by_terminal($_POST['terminal_id']);
+                if($cproduct){
+                    $cproduct->client_id 					=	$_SESSION["client_ident"];
+                    //$cproduct->client_name				=	$_POST["clientname"];
+
+                    $cproduct->terminal_id                  =   $_POST['terminal_id'];
+                    $cproduct->prod_name                    =   $_POST['product_name'];
+                    $cproduct->branch                       =   $_POST['branch'];
+                    $cproduct->atm_type                     =   $_POST['atm_type'];
+                    $cproduct->install_status				=	1;
+                    $cproduct->status  					    =	1;
+                    $cproduct->client_id                    = $_SESSION['client_ident'];
+                    $cproduct->install_city                 = $_POST['city'];
+                    $cproduct->install_address              = $_POST['location'];
+                    $cproduct->install_state                = $_POST['state'];
+                    $cproduct->update();
+                }else{
+                    $cproduct = new Cproduct();
+                    $cproduct->client_id 					=	$_SESSION["client_ident"];
+                    //$cproduct->client_name				=	$_POST["clientname"];
+                    $cproduct->terminal_id                  =   $_POST['terminal_id'];
+                    $cproduct->prod_name                    =   $_POST['product_name'];
+                    $cproduct->branch                       =   $_POST['branch'];
+                    $cproduct->atm_type                     =   $_POST['atm_type'];
+                    $cproduct->install_status				=	1;
+                    $cproduct->status  					    =	1;
+                    $cproduct->datecreated  				=	date("Y-m-d H:i:s");
+                    $cproduct->install_city                 = $_POST['city'];
+                    $cproduct->install_address              = $_POST['location'];
+                    $cproduct->install_state                = $_POST['state'];
+                    $cproduct->create();
+
+
+                }
                 if(!empty($input)){
                     foreach($input as $key=>$value){
                         $activate->$key = $value;
                     }
                     $activate->client_id = $_SESSION['client_ident'];
+                    $activate->prod_id  = $cproduct->id;
+                    $activate->created_at = date("Y-m-d H:i:s");
+                    $activate->updated_at = date("Y-m-d H:i:s");
                 }
                 if($activate->create()){
                     return 1;     //returns 1 on success
@@ -80,6 +117,58 @@
                     $message = $message.$error[$i].", ";
                 }
                 echo "<div data-alert class='alert-box error'><a href='#' class='close'>&times;</a>$message</div>";*/
+
+                return 3;
+
+            }
+        }
+
+
+        public function updateActivate(){
+            global $database;
+            $error = array();
+            $activate = Activation::find_by_id($_POST['pgid']);
+
+            $input = $_REQUEST;
+
+            if(isset($_POST["contact_name"])){
+                if($_POST['contact_name'] != ""){
+                    $activate->contact_name = $_POST['contact_name'];
+                }
+                else array_push($error,"Contact Name");
+            }else array_push($error,"Contact Name");
+            if(isset($_POST["terminal_id"])){
+                if($_POST['terminal_id'] != ""){
+                    $activate->contact_name = $_POST['terminal_id'];
+                }
+                else array_push($error,"Terminal ID");
+            }else array_push($error,"Terminal ID");
+
+            if(empty($error)){
+                if(!empty($input)){
+
+
+
+
+
+                    foreach($input as $key=>$value){
+                        $activate->$key = $value;
+                    }
+                    $activate->client_id = $_SESSION['client_ident'];
+                    $activate->updated_at = date("Y-m-d H:i:s");
+                }
+                if($activate->update()){
+                    return 1;     //returns 1 on success
+                }else{
+                    return 2; //unexpected Error
+                }
+            }else{
+                /* $message = "Please check the following errors: ";
+                 $lenght = count($error);
+                 for($i = 0; $i < $lenght; $i++){
+                     $message = $message.$error[$i].", ";
+                 }
+                 echo "<div data-alert class='alert-box error'><a href='#' class='close'>&times;</a>$message</div>";*/
 
                 return 3;
 

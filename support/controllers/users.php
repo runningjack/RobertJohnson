@@ -63,17 +63,18 @@ class Users extends Controller{
 	public function doCreate(){
 		@$this->loadModel("Users");
 		if($this->model->create()===1){
-			$_SESSION['message'] ="<div data-alert class='alert-box success round'>Transaction Successful<a href='#' class='close'>&times;</a></div>";
-			redirect_to($this->uri->link("users/index"));
+			$_SESSION['message'] ="<div  class='alert alert-success'>User Created Successfully</div>";
+			//redirect_to($this->uri->link("users/index"))
+                redirect_to("?url=users/index");
 		}elseif($this->model->create()===2){
-			$_SESSION['message'] ="<div data-alert class='alert-box alert round'><b>Unexpected error!</b> Transaction Unsuccessful <a href='#' class='close'>&times;</a></div>";
-			redirect_to($this->uri->link("users/index"));
+			$_SESSION['message'] ="<div class='alert alert-info  round'><b>Unexpected error!</b> Transaction Unsuccessful <a href='#' class='close'>&times;</a></div>";
+            redirect_to("?url=users/create");
 		}elseif($this->model->create()===3){
-			$_SESSION['message'] ="<div data-alert class='alert-box alert round'><b>Unexpected error!</b> Transaction was not successful <a href='#' class='close'>&times;</a></div>";
-			redirect_to($this->uri->link("users/index"));
+			$_SESSION['message'] ="<div class='alert alert-danger'><b>Unexpected error!</b> Transaction was not successful <a href='#' class='close'>&times;</a></div>";
+            redirect_to("?url=users/create");
 		}elseif($this->model->create()===4){
 			$_SESSION['message'] ="<div data-alert class='alert-box alert round'>Record not saved! Ensure that all required field are set <a href='#' class='close'>&times;</a></div>";
-			redirect_to($this->uri->link("users/index"));
+            redirect_to("?url=users/create");
 		}
 	}
 	public function doUpdate(){

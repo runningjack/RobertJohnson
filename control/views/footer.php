@@ -1,4 +1,15 @@
 </div><!--End of container no border-->
+
+<div id="myProcess" class="reveal-modal medium" data-animation="fade" >
+    <div id="transProcess" style=' width:317px; margin:10px auto' ><img src='<?= DIR_ASSETS;?>img/bigLoader.gif'  ><h4>Processing Request... Please Wait!</h4></div>
+    <a class="close-reveal-modal"><img src="public/icons/Close16.png" width="16" height="16" /></a>
+</div>
+
+<div id="myAssignTech" class="reveal-modal medium" data-animation="fade" >
+    <div id="transProcess" style=' width:317px; margin:10px auto' ><img src='<?= DIR_ASSETS;?>img/bigLoader.gif'  ><h4>Processing Request... Please Wait!</h4></div>
+    <a class="close-reveal-modal"><img src="public/icons/Close16.png" width="16" height="16" /></a>
+
+</div>
 <footer id="footer">
 	<div class="row">
 		<div class="large-12 columns">
@@ -11,35 +22,38 @@
   <script src="public/js/foundation.min.js"></script>
 
   <script src="public/js/foundation/foundation.js"></script>
-  
-  <script src="public/js/foundation/foundation.interchange.js"></script>
-  
-  <script src="public/js/foundation/foundation.abide.js"></script>
-  
-  <script src="public/js/foundation/foundation.dropdown.js"></script>
-  
-  <script src="public/js/foundation/foundation.placeholder.js"></script>
-  
-  <script src="public/js/foundation/foundation.forms.js"></script>
-  
-  <script src="public/js/foundation/foundation.alerts.js"></script>
-  
-  <script src="public/js/foundation/foundation.magellan.js"></script>
-  
-  <script src="public/js/foundation/foundation.reveal.js"></script>
-  
-  <script src="public/js/foundation/foundation.tooltips.js"></script>
-  
-  <script src="public/js/foundation/foundation.clearing.js"></script>
-  
-  <script src="public/js/foundation/foundation.cookie.js"></script>
-  
-  <script src="public/js/foundation/foundation.joyride.js"></script>
-  
-  <script src="public/js/foundation/foundation.orbit.js"></script>
-  
-  <script src="public/js/foundation/foundation.section.js"></script>
-  
+<script src="public/js/foundation/foundation.interchange.js"></script>
+
+<script src="public/js/foundation/foundation.abide.js"></script>
+
+<script src="public/js/foundation/foundation.dropdown.js"></script>
+
+<script src="public/js/foundation/foundation.placeholder.js"></script>
+
+<script src="public/js/foundation/foundation.forms.js"></script>
+
+<script src="public/js/foundation/foundation.alerts.js"></script>
+
+<script src="public/js/foundation/foundation.magellan.js"></script>
+
+<script src="public/js/foundation/foundation.reveal.js"></script>
+
+<script src="public/js/foundation/foundation.tooltips.js"></script>
+
+<script src="public/js/foundation/foundation.clearing.js"></script>
+
+<script src="public/js/foundation/foundation.cookie.js"></script>
+
+<script src="public/js/foundation/foundation.joyride.js"></script>
+
+<script src="public/js/foundation/foundation.orbit.js"></script>
+
+<script src="public/js/foundation/foundation.section.js"></script>
+
+<script src="public/js/foundation/foundation.topbar.js"></script>
+<script type="text/javascript" src="public/js/jquery.form.js"></script>
+<link rel="stylesheet" type="text/css" href="public/css/jquery.simple-dtpicker.css"/>
+<script type="text/javascript" src="public/js/jquery.simple-dtpicker.js"></script>
   <script src="public/js/foundation/foundation.topbar.js"></script>
   <script type="text/javascript" src="public/js/jquery.form.js"></script>
   <link rel="stylesheet" type="text/css" href="public/css/jquery.simple-dtpicker.css"/>
@@ -51,10 +65,135 @@
 <script type="text/javascript" src="public/js/plugins/jqplot.categoryAxisRenderer.min.js"></script>
 <script type="text/javascript" src="public/js/plugins/jqplot.pointLabels.min.js"></script>
 <link rel="stylesheet" type="text/css" href="public/css/jquery.jqplot.min.css" />
+
+
+<script src="<?php echo DIR_ASSETS; ?>js/jquery-ui-1.10.3.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>plugins/input-mask/jquery.inputmask.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>plugins/input-mask/jquery.inputmask.extensions.js"></script>
+
+<!-- page script -->
+
+<script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/jquery.dataTables.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/dataTables.colVis.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/dataTables.tableTools.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>js/plugin/datatables/dataTables.bootstrap.min.js"></script>
+<script src="<?php echo DIR_ASSETS; ?>js/plugin/datatable-responsive/datatables.responsive.min.js"></script>
+
   
   <script >
     $(document).foundation();
 	$(document).ready(function(e) {
+
+
+
+
+
+
+        var availableTags = [
+            <?php
+				$employees = Employee::find_all();
+				foreach($employees as $emp){
+					echo '"'.$emp->emp_id."_". $emp->emp_fname ." ".$emp->emp_lname.'",' ;
+				}
+			     ?>
+        ];
+        $( "#emp" ).autocomplete({
+            source: availableTags
+        });
+    //});
+
+        //Datemask dd/mm/yyyy
+        $("#datemask").inputmask("yyyy-mm-dd", {"placeholder": "yyyy-mm-dd"});
+        //Datemask2 mm/dd/yyyy
+        $("#datemask2").inputmask("mm/dd/yyyy", {"placeholder": "mm/dd/yyyy"});
+        //Money Euro
+        $("[data-mask]").inputmask();
+
+
+
+        /* BASIC ;*/
+        var responsiveHelper_dt_basic = undefined;
+        var responsiveHelper_datatable_fixed_column = undefined;
+        var responsiveHelper_datatable_col_reorder = undefined;
+        var responsiveHelper_datatable_tabletools = undefined;
+
+        var breakpointDefinition = {
+            tablet : 1024,
+            phone : 480
+        };
+
+        $('#dt_basic').dataTable({
+            "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
+                "t"+
+                "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+            "autoWidth" : true,
+            "preDrawCallback" : function() {
+                // Initialize the responsive datatables helper once.
+                if (!responsiveHelper_dt_basic) {
+                    responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#dt_basic'), breakpointDefinition);
+                }
+            },
+            "rowCallback" : function(nRow) {
+                responsiveHelper_dt_basic.createExpandIcon(nRow);
+            },
+            "drawCallback" : function(oSettings) {
+                responsiveHelper_dt_basic.respond();
+            }
+        });
+
+        /* END BASIC */
+
+
+        /* COLUMN FILTER  */
+        var otable = $('#datatable_fixed_column').DataTable({
+            //"bFilter": false,
+            //"bInfo": false,
+            //"bLengthChange": false
+            //"bAutoWidth": false,
+            //"bPaginate": false,
+            //"bStateSave": true // saves sort state using localStorage
+            "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6 hidden-xs'f><'col-sm-6 col-xs-12 hidden-xs'<'toolbar'>>r>"+
+                "t"+
+                "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+
+            "autoWidth" : true,
+            "preDrawCallback" : function() {
+                // Initialize the responsive datatables helper once.
+                if (!responsiveHelper_datatable_fixed_column) {
+                    responsiveHelper_datatable_fixed_column = new ResponsiveDatatablesHelper($('#datatable_fixed_column'), breakpointDefinition);
+                }
+            },
+            "rowCallback" : function(nRow) {
+                responsiveHelper_datatable_fixed_column.createExpandIcon(nRow);
+            },
+            "drawCallback" : function(oSettings) {
+                responsiveHelper_datatable_fixed_column.respond();
+            }
+
+        });
+
+        // custom toolbar
+        $("div.toolbar").html('<div class="text-right"></div>');
+
+        // Apply the filter
+        $("#datatable_fixed_column thead th input[type=text]").on( 'keyup change', function () {
+
+            otable
+                .column( $(this).parent().index()+':visible' )
+                .search( this.value )
+                .draw();
+
+        } );
+
+        $("#datatable_fixed_column_filter label").addClass("input-group")
+        $("#datatable_fixed_column_filter label input.form-control").attr("placeholder","Search by any field")
+
+
+
+
+
+
 	   var globals = { 'myissue':'','payment_target':'catchable','empid':'','staffid':'','instname':'','qual':'','cert':'','grade':'','iyfro':'','iyto':'',};
        var myDataArray  = new Object;
 	// $( "#datepicker" ).dtpicker();
@@ -256,8 +395,8 @@
          $("#btnins").click(function(){
             $.ajax({url:"?url=employees/doInsertEmp_INS",type:"POST",data:{empid:$("#empid").val(),staffid:$("#staffid").val(),insname:$("#institution").val(),qual:$("#qualification").val(),grade:$("#grade").val(),cert:$("#cert").val(),datefro:$("#insdatefro").val(),dateto:$("#insdateto").val()},
                     success : function(data){
-                        $("#tblins").html(data)
-                    }
+                    $("#tblins").html(data)
+                }
             })
             return false
          })
@@ -445,7 +584,6 @@
                             setInterval(window.location.reload(),20000)
                        }
 					 })
-                      
 				}
                 
                 if(rel === globals.payment_target && e.target.value==="Cancel"){
@@ -926,12 +1064,62 @@ $("#clientname").keyup(function(){
 	
 		return false
     });
-    
-    
-    $("#dh").click(function(){
+
+
+
+
+        $(".cschedule").each(function(){
+            var tid = $(this).attr("sid")
+            var status = $(this).val()
+            $(this).change(function(){
+                var status = $(this).val()
+                $('#myProcess').foundation('reveal', 'open', {
+                    url: '?url=support/closeschedule/'+tid,
+                    type :"POST",
+                    data:{tid:tid,status:status},
+                    success: function(data) {
+                        $("#myProcess").html(data)
+                    },
+                    error: function() {
+                        alert('failed loading modal');
+                    }
+                });
+                setInterval(function(){location.reload();  }, 3000);
+            })
+
+        })
+
+
+        $(".cschedule2").each(function(){
+            var tid = $(this).attr("sid")
+            var status = $(this).val()
+            $(this).change(function(){
+                var status = $(this).val()
+                $('#myProcess').foundation('reveal', 'open', {
+                    url: '?url=support/closescheduleticket/'+tid,
+                    type :"POST",
+                    data:{tid:tid,status:status},
+                    success: function(data) {
+                        $("#myProcess").html(data)
+                    },
+                    error: function() {
+                        alert('failed loading modal');
+                    }
+                });
+                setInterval(function(){location.reload();  }, 3000);
+            })
+
+        })
+
+
+
+
+        $("#dh").click(function(){
         $("#hideme").slideToggle();
         return false
     })
+
+    $("#")
     
     $("#close").click(function(){
         $.ajax({url:"?url=support/doCloseTicket",type:"POST",data:{id:$("#disid").val(),cemail:$("cemail").val()},
@@ -939,6 +1127,7 @@ $("#clientname").keyup(function(){
                 $("#divclose").html(data);
             }
         })
+        document.location.reload(true);
         return false
     })
     
@@ -947,15 +1136,27 @@ $("#clientname").keyup(function(){
 	to update the client reply via ajax*/
 	$("#replysave").click(function(){
 	   //console.log($("#disid").val())
+	   //
+	   $("#transProcess").html("<div style=' width:317px; margin:10px auto'><img src='<?php echo DIR_ASSETS;?>img/bigLoader.gif'  ><h4>Please Wait</h4><div>")
+        $('#myProcess').foundation('reveal', 'open');
 		$.ajax({url:"?url=support/doCreateAdminReply/" + $("#disid").val(), type:"POST", data:{cemail:$("#cemail").val(),issues:$("#issue").val(),conname:$("#cname").val()},
 		success : function(data){
-			
+
 				$("#granddiv").html(data)
-			}
-            
+                $("#hideme").slideToggle();
+            $("#transProcess").html("<h4>Process Complete!</h4>");
+            }
 		})
-        $("#hideme").slideToggle();
+
+        $("#issue").val("")
+        //$("#hideme").html("<div style=' width:317px; margin:10px auto'><img src='<?php echo DIR_ASSETS;?>img/bigLoader.gif'  ><h4>Please Wait</h4><div>")
+        //document.location.reload(true);
+
+        $('a.close-reveal-modal').trigger('click');
 	})
+
+        $("li#dt_basic_previous a").html("Prev");
+
 	/*close client reply ajax section*/
     
     $("#btnwk").click(function(){
@@ -980,13 +1181,18 @@ $("#clientname").keyup(function(){
      update schedule for client product
      */
     $("#ssave").click(function(){
-        
-        $.ajax({url:"?url=clientproduct/doScheduleUpdate", type:"POST", data:{cid:$("#cid").val(),sdate:$("#sdate").val()},
+        $("#transProcess").html("<div style=' width:317px; margin:10px auto'><img src='<?php echo DIR_ASSETS;?>img/bigLoader.gif'  ><h4>Please Wait</h4><div>")
+        $('#myProcess').foundation('reveal', 'open');
+        $.ajax({url:"?url=clientproduct/doScheduleUpdate", type:"POST", data:{cid:$("#cid").val(),sdate:$("#sdate").val(),emp:$("#empfield").val()},
         success : function(data){
-            $("#searchdata").html(data)
+            $("#transProcess").html(data);
         }
         })
+        setInterval(window.location.reload(),20000)
     })
+
+
+        $( "#taskdate" ).datepicker({ dateFormat: 'yy-mm-dd' });
     
      /*
      the section is needed to save sch
@@ -995,12 +1201,32 @@ $("#clientname").keyup(function(){
      */
     $("#csave").click(function(){
         //console.log($("#cid").val() +" "+ $("#mtype").val() +" "+ $("#taskdate").val() + " "+$("#emp").val())
-        $.ajax({url:"?url=clientproduct/doCreateSchedule/" + $("#disid").val(), type:"POST", data:{cid:$("#cid").val(),mtype:$("#mtype").val(),taskdate:$("#taskdate").val(), empid:$("#emp").val(),tissue:$("#tissue").val(),cemail:$("#cemail").val(),},
-         success : function(data){
-            $("#searchdata2").html(data)
-         }
+        $("#transProcess").html("<div style=' width:317px; margin:10px auto'><img src='<?php echo DIR_ASSETS;?>img/bigLoader.gif'  ><h4>Please Wait</h4><div>")
+        $('#myProcess').foundation('reveal', 'open');
+        $.ajax({url:"?url=clientproduct/doCreateSchedule/" + $("#disid").val(), type:"POST", data:{cid:$("#cid").val(),mtype:$("#mtype").val(),taskdate:$("#taskdate").val(), empid:$("#emp").val(),tissue:$("#tissue").val(),cemail:$("#cemail").val()},
+            success : function(data){
+                $("#transProcess").html(data);
+                ("#hideme").slideToggle();
+            }
         })
+        setInterval(window.location.reload(),20000)
+
     })
+
+
+        $("#csavell").click(function(){
+            //console.log($("#cid").val() +" "+ $("#mtype").val() +" "+ $("#taskdate").val() + " "+$("#emp").val())
+            $("#transProcess").html("<div style=' width:317px; margin:10px auto'><img src='<?php echo DIR_ASSETS;?>img/bigLoader.gif'  ><h4>Please Wait</h4><div>")
+            $('#myProcess').foundation('reveal', 'open');
+            $.ajax({url:"?url=clientproduct/doCreateSchedule/" + $("#disid").val(), type:"POST", data:{cid:$("#cid").val(),mtype:$("#mtype").val(),taskdate:$("#taskdate").val(), empid:$("#emp").val(),tissue:$("#tissue").val(),cemail:$("#cemail").val()},
+                success : function(data){
+                    $("#transProcess").html(data);
+                    //("#hideme").slideToggle();
+                }
+            })
+            setInterval(window.location.reload(),20000)
+
+        })
     
     
     /*
@@ -1032,9 +1258,7 @@ $("#clientname").keyup(function(){
         })
     })
     
-    
-    
-    
+
     $("#adpart").click(function(){
         $("#ptable").html("")
                 $("#ptable").append("<div class='ddd' style='width:150px; margin:50px auto; height:50px'></div>")
@@ -1173,7 +1397,7 @@ $("#clientname").keyup(function(){
                 $.ajax({
                     url:"?url=support/ticketlist",
                     type:"POST",
-                    data:{prodname:$("#cprodname").val(),prodid:$("#prod_id").val(),clientid:$("#clientid").val(),status:$("#status").val(),issue:$("#issue").val()},
+                    data:{prodname:$("#cprodname").val(),prodid:$("#prod_id").val(),clientid:$("#clientid").val(),status:$("#status2").val(),issue:$("#issue").val()},
                     success: function(result){
                         $("#emplisting").html(result);
                     }
@@ -1208,7 +1432,7 @@ $("#clientname").keyup(function(){
                 $.ajax({
                     url:"?url=support/scheduleList",
                     type:"POST",
-                    data:{prodname:$("#cprodname").val(),prodid:$("#prod_id").val(),clientid:$("#clientid").val(),status:$("#status").val(),issue:$("#issue").val()},
+                    data:{prodname:$("#cprodname").val(),prodid:$("#prod_id").val(),clientid:$("#clientid").val(),status:$("#status2").val(),issue:$("#issue").val()},
                     success: function(result){
                         $("#emplisting").html(result);
                     }

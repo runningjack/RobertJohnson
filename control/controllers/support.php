@@ -9,7 +9,7 @@ class Support extends Controller{
 		}
 	}
     
-    public function index($mid=1){
+    /*public function index($mid=1){
         $uri=new Url("");
         @$this->loadModel("Support");
         $dashData                       =   array();
@@ -18,16 +18,17 @@ class Support extends Controller{
         $this->view->aticketcount       =   $dashData['atcount'];
         $this->view->oschedule           =   $dashData['oschedule'];
         $this->view->oworksheet          =   $dashData['oworksheet'];
-        $this->view->clients            =   $dashData['clients'];
+       // $this->view->clients            =   $dashData['clients'];
         $this->view->cproducts          =   $dashData['cproducts'];
         $lastmonth                      =   (int)date("m")-1;
         $curmonth                       =   date("n");
-       
+        $this->view->openPendings       = $dashData['openPendings'];
+
         $this->view->monthreport        =   $this->model->getMonthlyReportFinance(" Month(datecreated) ='".$curmonth."' AND Year(datecreated)='".date("Y")."'");
         $this->view->lastmonthreport    =   $this->model->getLastMonthlyReportFinance(" Month(datecreated) ='".$lastmonth."' AND Year(datecreated)='".date("Y")."'");
         $this->view->thisquarter        =   $this->model->getThisQuaterReportFinance(" Quarter(datecreated) ='".self::date_quarter()."' AND Year(datecreated)='".date("Y")."'");
         $this->view->render("support/index");
-    }
+    }*/
     
     private static function date_quarter()
     {
@@ -51,12 +52,12 @@ class Support extends Controller{
 		if(empty($mid)){
 			redirect_to($this->uri->link("error/index"));
 			exit;
-		}
+		}else{
 		$this->loadModel("Support");
 		$datum = $this->model->getList("","support");
 		$this->view->mytickets =$datum['Supportticket'];
         $uri = new Url("");
-        $ticketlist .="<div class='row'><div class='large-12 columns'>".$datum['mypagin']; $ticketlist .="</div></div><div class='row'><div class='large-12 columns'><table class='pure-table'  width='100%'>
+        $ticketlist .="<div class='row'><div class='large-12 columns'>"; $ticketlist .="</div></div><div class='row'><div class='large-12 columns'><table id='dt_basic' class='pure-table'  width='100%'>
 			<thead><tr>
 				<th width='10%'>Date</th><th width='2%'>ticketID</th><th width='15%'>Product</th><th width='10%'>Client </th><th width='45%'>Issue(s)</th><th width='10%'>Status </th><th width='12%'>Date Modified </th><th width='5%'></th>
 			</tr>
@@ -67,7 +68,7 @@ class Support extends Controller{
 				  $x =1;
 				foreach($this->view->mytickets as $ticket){
 				$ticketlist .="<tr>
-					<td>".date_format(new DateTime($ticket->datecreated),"M d Y H:i:s")."</td><td>$ticket->id</td><td>";
+					<td>".date_format(date_create($ticket->datecreated),"M d Y H:i:s")."</td><td>$ticket->id</td><td>";
                     $cprod = $this->model->getClientProdByID($ticket->prod_id);
                     $ticketlist .= $cprod->prod_name." ". $cprod->install_address." ". $cprod->install_city;
                     
@@ -75,7 +76,7 @@ class Support extends Controller{
                    $ticketlist .="</td><td>";
                    $client  =   $this->model->getClientByID($ticket->client_id);
                    $ticketlist .=$client->name ;
-                   $ticketlist .="</td><td>$ticket->issue </td><td>$ticket->status</td><td>".date_format(new DateTime($ticket->datemodified),"M d Y H:i:s")."</td><td><a href='".$uri->link("support/detail/".$ticket->id."")."'>View Ticket</a></td>
+                   $ticketlist .="</td><td>$ticket->issue </td><td>$ticket->status</td><td>".date_format(date_create($ticket->datemodified),"M d Y H:i:s")."</td><td><a href='".$uri->link("support/detail/".$ticket->id."")."'>View Ticket</a></td>
 				</tr>";
 				$x++;
 				}
@@ -84,9 +85,9 @@ class Support extends Controller{
 			  }
 			
 			$ticketlist .= "</tbody>
-			</table></div></div><div class='row'><div class='large-12 columns'>"; $ticketlist .=$datum['mypagin']."</div><p>&nbsp;</p></div>";
-			
-            
+			</table></div></div><div class='row'><div class='large-12 columns'>"; $ticketlist .="</div><p>&nbsp;</p></div>";
+
+        }
             $this->view->myvends = $ticketlist;
             if(isset($_POST['prodname'])){
                         echo $ticketlist;
@@ -106,7 +107,7 @@ class Support extends Controller{
      */
     public function detail($id=""){
 	   @$this->loadModel("Support");
-        //$datum = $this->model->getData();
+        $datum = $this->model->getData();
         $replyData = $this->model->getTicketData($id);
         //$this->view->state = $datum['state'];
         $uri = new Url("");
@@ -126,11 +127,25 @@ class Support extends Controller{
         
          if($ticket){
             /**
-             * form opens
+             * Load ticket buttons
              */
              
              $pgdetail .="<div class='row'><input type='hidden' name='cid' id='cid' value='$ticket->prod_id' />
-     	<div class='large-12 columns'><div class='btn-group'><a href='".$uri->link("support/ticketlist")."'class='btn btn-info button'  >&laquo; Back</a> <a href='#' id='dh' class='btn btn-primary button'> Reply </a>"; ($ticket->status !="Closed") ? $pgdetail .="<a href='#' id='close' class='btn btn-danger button' >Close Ticket </a>" : ""; $pgdetail .="<a href='#' data-reveal-id='myModal5' class='btn btn-info button'>Assign Task to Employee</a></div>
+     	<div class='large-12 columns'><div class='btn-group'><a href='".$uri->link("support/ticketlist")."'class='btn btn-info button'  >&laquo; Back</a>";
+             if($ticket->status !="Closed"){ //if status is not closed
+                 /*Check if a technician has been assigned*/
+
+                 if(Schedule::find_by_ticket_id($ticket->id)){
+                     /*If exist do not display assign task button*/
+                     $pgdetail .=  "<a href='#' id='dh' class='btn btn-primary button'> Reply </a><a href='#' id='close' class='btn btn-danger button' >Close Ticket </a>";
+                 }else{
+                     $pgdetail .=  "<a href='#' id='dh' class='btn btn-primary button'> Reply </a><a href='#' id='close' class='btn btn-danger button' >Close Ticket </a><a href='#' data-reveal-id='myModal5' class='btn btn-info button'>Assign Task to Employee</a>";
+                 }
+
+
+             }
+
+             $pgdetail .="</div>
      </div></div>
          </div> <!--closing to reload close -->
          <div id='hideme'><form action='". $uri->link("support/doCreateAdminReply/".$ticket->id."") ."' method='post' enctype='multipart/form-data' name='frmEmp5' id='frmEmp5'>
@@ -248,7 +263,7 @@ class Support extends Controller{
           $ticket = $replyData['ticket'];
           $replies    =   $replyData["replies"];
           
-          $pgdetail ="<div data-alert class='alert-box success'>Record Saved <a href='#' class='close'>&times;</a></div>";
+          $pgdetail ="";
           
           if($ticket){
             $pgdetail .="<div id='divclose'><div class='row'>
@@ -381,8 +396,56 @@ class Support extends Controller{
         
         echo $pgdetail;
     }
-    
-    
+
+
+
+
+    public function activationlist(){
+        $this->loadModel("Support");
+        $datum = $this->model->ActivationList("","support");
+
+        $this->view->mytickets = $datum['activations'];
+        $ticketlist="";
+
+        $uri = new Url("");
+        $ticketlist .="<div class='row'><div class='large-12 columns'>"; $ticketlist .="</div></div><div class='row'><div class='large-12 columns'><table id='dt_basic' class='pure-table'  width='100%'>
+			<thead><tr>
+				<th >Date</th><th>Terminal ID</th><th >Product</th><th>Client </th><th >Location</th><th>Status </th><th></th>
+			</tr>
+			</thead>
+			<tbody>";
+
+        if($this->view->mytickets){
+            $x =1;
+            foreach($this->view->mytickets as $ticket){
+                $ticketlist .="<tr>
+					<td>".date_format(date_create($ticket->datecreated),"M d Y")."</td><td>$ticket->terminal_id</td><td>$ticket->product_name</td><td>";
+
+                if($ticket->client_id !=""){
+                    $client  =  Client::find_by_id($ticket->client_id);
+                    $ticketlist .=$client->name ;
+                }
+
+                $ticketlist .="</td><td>$ticket->location </td><td>$ticket->status</td><td><a href='".$uri->link("support/activationdetails/".$ticket->id."")."'>View</a></td>
+				</tr>";
+                $x++;
+            }
+        }else{
+            $ticketlist .= "<tr><td colspan='7'>No record to display</td></tr>";
+        }
+
+        $ticketlist .= "</tbody>
+			</table></div></div><div class='row'><div class='large-12 columns'>"; $ticketlist .="</div><p>&nbsp;</p></div>";
+
+        $this->view->schedules = $ticketlist;
+        $this->view->render("support/activationlist");
+
+    }
+
+    public function activationdetails($id){
+        $this->view->activation = Activation::find_by_id($id);
+        $this->view->render("support/activationdetails");
+    }
     
     
     
@@ -418,7 +481,7 @@ class Support extends Controller{
          $client = $this->model->getClientByID($cprod->client_id);
         
          $signofflisting .=$client->name;
-         $signofflisting .="</td><td>$signoff->status </td><td>$signoff->employee_id</td><td>$signoff->client_remark</td><td>".date_format(new DateTime($signoff->datecreated),"M d Y H:i:s")."</td>";
+         $signofflisting .="</td><td>$signoff->status </td><td>$signoff->employee_id</td><td>$signoff->client_remark</td><td>".date_format(date_create($signoff->datecreated),"M d Y H:i:s")."</td>";
         
         
         /**
@@ -537,7 +600,7 @@ $this->view->myvends = $signofflisting;
          $emp   =   $this->model->getEmployee((int)preg_replace('#[^0-9]#i','',$worksheet->cse_emp_id));
          //print_r($cprod);
          $worksheetlisting .= $emp->emp_fname." ". $emp->emp_lname ;
-         $worksheetlisting .= "</td><td>".date_format(new DateTime($worksheet->sheet_date),"M d Y H:i:s")."</td><td>".Worksheet::getExpensesById($worksheet->id)."</td>";
+         $worksheetlisting .= "</td><td>".date_format(date_create($worksheet->sheet_date),"M d Y H:i:s")."</td><td>".Worksheet::getExpensesById($worksheet->id)."</td>";
         
         /**
           * section to set grant and\
@@ -605,11 +668,9 @@ $this->view->myvends = $worksheetlisting;
             }else{
                 $this->view->render("support/worksheetlist");
             }
-	        
+
     }
-    
-    
-    
+
     /**
 	 * this section is
      * needed to list out worksheets
@@ -637,6 +698,28 @@ $this->view->myvends = $worksheetlisting;
         $this->view->myworksheet    =   $this->model->getWorkSheetByID($id);
         $this->view->render("support/worksheetedit");
     }
+
+
+    public function closeschedule($id){
+        @$this->loadModel("Support");
+
+        if($this->model->getCloseSchedule($id) == true ){
+            echo "<h4>Status processed successfully</h4>";
+        }else{
+            echo "<h4>Unexpected Error</h4>";
+        }
+        //exit;
+    }
+
+    public function closescheduleticket($id){
+        @$this->loadModel("Support");
+
+        if($this->model->getCloseScheduleTicket($id) == true ){
+            echo "<h4>Status processed successfully</h4>";
+        }else{
+            echo "<h4>Unexpected Error</h4>";
+        }
+    }
     
     public function doDeleteWorkSheet($id){
         
@@ -652,18 +735,15 @@ $this->view->myvends = $worksheetlisting;
     
     public function signoffedit($id){
         $this->loadModel("Support");
-        $datum                    =     array();
-        $datum                    =     $this->model->getData();
-        $this->view->products     =     $datum['myproducts'];
-        $this->view->mysignoff    =   $this->model->getSignOffByID($id);
-        
-        $this->view->techstaff  =   $datum['techstaff'];
-        
-        $this->view->clientprod   =     $this->model->getClientProdByID($this->view->mysignoff->prod_id);
+        $datum                      =     array();
+        $datum                      =     $this->model->getData();
+        $this->view->products       =     $datum['myproducts'];
+        $this->view->mysignoff      =   $this->model->getSignOffByID($id);
+        $this->view->techstaff      =   $datum['techstaff'];
+        $this->view->clientprod     =     $this->model->getClientProdByID($this->view->mysignoff->prod_id);
         $this->view->render("support/signoffedit");
     }
-    
-    
+
 	public function scheduleList(){
 		
 		$schedulelisting ="";
@@ -672,12 +752,12 @@ $this->view->myvends = $worksheetlisting;
 		$datum = $this->model->getScheduleList("","support");
 		$this->view->schedules =$datum['schedules'];
         $uri = new Url("");
-        $schedulelisting .="<div class='row'><div class='large-12 columns'>".$datum['mypagin']; $schedulelisting .="</div></div><div class='row'><div class='large-12 columns'><table  width='100%'>
-<thead><tr>
-	<th>S/N</th><th>Product/Machine</th><th>Client</th><th>Status</th><th>Technician</th><th>Issue</th><th>Date Generated </th><th></th><th></th>
-</tr>
-</thead>
-<tbody>";
+        $schedulelisting .="<div class='row'><div class='large-12 columns'><table id='dt_basic'  width='100%'>
+        <thead><tr>
+            <th>S/N</th><th>Product/Machine</th><th>Term. ID</th><th>Client</th><th>Status</th><th>Technician</th><th>Issue</th><th>Date Generated </th><th>Work Sheet</th><th>Action</th>
+        </tr>
+        </thead>
+        <tbody>";
 
   if($this->view->schedules){
 	  $x =1;
@@ -686,21 +766,31 @@ $this->view->myvends = $worksheetlisting;
     	<td>$x</td><td>";
         $cprod = $this->model->getClientProdByID($schedule->prod_id);
         $schedulelisting .= $cprod->prod_name." ". $cprod->install_address." ". $cprod->install_city;
-        
-         $schedulelisting .="</td><td>";
-         
+         $schedulelisting .="</td><td>$cprod->terminal_id</td><td>";
          $client = $this->model->getClientByID($schedule->client_id);
-        
          $schedulelisting .=$client->name;
-         $schedulelisting .="</td><td>$schedule->status </td><td><input type='hidden' class='empid'  /> $schedule->emp_name</td><td>$schedule->issue</td><td>".date_format(new DateTime($schedule->datecreated),"M d Y H:i:s")."</td><td>";
+         $schedulelisting .="</td><td>";
+        if(strtolower($schedule->status) == 'open'){
+            $schedulelisting .= "<span class='label bg-red' style='padding:5px'>$schedule->status";
+        }elseif(strtolower($schedule->status) == "closed"){
+            $schedulelisting .= "<span class='label bg-green' style='padding:5px'>$schedule->status";
+        }elseif(strtolower($schedule->status) == "in progress"){
+            $schedulelisting .="<span class='label bg-blue' style='padding:5px'>In Progress";
+        }
+
+        $schedulelisting .="</td><td><input type='hidden' class='empid'  /> $schedule->emp_name</td><td>$schedule->issue</td><td>".date_format(date_create($schedule->datecreated),"M d Y H:i:s")."</td><td>";
         
         if($schedule->status==="Open"){
             $schedulelisting .="<a href='".$uri->link("support/addworksheet/".$schedule->id."")."'>Get Work Sheet</a>";
         }/*else{
             $schedulelisting .="<a href='".$uri->link("support/taskdetail/".$schedule->id."")."'>View Detail</a>";
         }*/
+
+
         
-    $schedulelisting .="</td></tr>";
+    $schedulelisting .="</td><td>"; if($schedule->status ==="Open" || $schedule->status =="In Progress"){
+            $schedulelisting .="<select sid='$schedule->id' class='cschedule'><option values='0'>Open</option><option values='1'>Closed</option><option values='2'>In Progress</option></select>  ";
+        }$schedulelisting .="</td></tr>";
 	$x++;
     }
   }else{
@@ -708,7 +798,7 @@ $this->view->myvends = $worksheetlisting;
   }
 
 $schedulelisting .= "</tbody>
-</table></div></div><div class='row'><div class='large-12 columns'>"; $schedulelisting .=$datum['mypagin']."</div><p>&nbsp;</p></div>";
+</table></div></div>";
 
 $this->view->myvends = $schedulelisting;
         if(isset($_POST['clientid'])){
